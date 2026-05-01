@@ -189,30 +189,38 @@ npm run build:frontend
 
 This repository is ready for a split GitHub deployment:
 
-- `frontend/` -> Netlify
+- `frontend/` -> Vercel
 - `backend/` -> Render
 
 The backend host above is based on the deployment target that best matches your request. If by "blender" you meant a different provider, the code changes here still prepare the backend for a standard Node.js host with environment variables, Prisma migrations, and a health check.
 
-### Frontend on Netlify
+### Frontend on Vercel
 
-The repo now includes [netlify.toml](/c:/Users/Abhishek/Gradly/netlify.toml) for a GitHub-connected Netlify deploy from the `frontend/` subdirectory. A matching [frontend/netlify.toml](/c:/Users/Abhishek/Gradly/frontend/netlify.toml) is also kept for local clarity.
+The frontend is a standard Next.js app and now includes [frontend/vercel.json](/c:/Users/Abhishek/Gradly/frontend/vercel.json) plus [frontend/.env.example](/c:/Users/Abhishek/Gradly/frontend/.env.example) to make a Vercel import easier.
 
-Netlify site settings:
+Vercel project settings:
 
-1. Connect the same GitHub repository.
-2. Base directory: `frontend`
-3. Build command: `npm run build`
-4. Publish directory: leave blank and let the Next.js Netlify plugin manage it.
-5. Node version: `20`
+1. Import the same GitHub repository.
+2. Framework preset: `Next.js`
+3. Root directory: `frontend`
+4. Build command: leave the Vercel default
+5. Output directory: leave the Vercel default
+6. Node.js version: `20`
 
-Frontend environment variables on Netlify:
+Frontend environment variables on Vercel:
 
 ```env
 NEXT_PUBLIC_API_URL="https://gradly-b849.onrender.com"
 NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT].supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
 ```
+
+Notes:
+
+- Do not set the root directory to the repo root. Use `frontend`.
+- Do not add a custom output directory for this app.
+- Vercel will detect Next.js automatically from `frontend/package.json`.
+- If you use the Vercel CLI instead of the dashboard, run `vercel` from `frontend/` or use `vercel --cwd frontend`.
 
 ### Backend on Render
 
@@ -232,8 +240,8 @@ Backend environment variables on Render:
 ```env
 DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres"
 JWT_SECRET="replace-with-a-strong-secret"
-CORS_ORIGIN="https://your-frontend-domain.netlify.app"
-FRONTEND_ORIGIN="https://your-frontend-domain.netlify.app"
+CORS_ORIGIN="https://your-frontend-domain.vercel.app"
+FRONTEND_ORIGIN="https://your-frontend-domain.vercel.app"
 NODE_ENV="production"
 ISSUER_BASE_URL="https://your-auth0-tenant.us.auth0.com"
 CLIENT_ID="your-auth0-client-id"
@@ -256,13 +264,13 @@ Notes:
 When the backend and frontend are live, update your Auth0 application settings to use the exact deployed domains:
 
 1. Allowed Callback URLs: `https://your-backend-domain.onrender.com/api/auth/auth0/callback`
-2. Allowed Logout URLs: `https://your-frontend-domain.netlify.app`
-3. Allowed Web Origins: `https://your-frontend-domain.netlify.app`
+2. Allowed Logout URLs: `https://your-frontend-domain.vercel.app`
+3. Allowed Web Origins: `https://your-frontend-domain.vercel.app`
 
 ### Production checklist
 
 1. Deploy the backend first and confirm `https://your-backend-domain.onrender.com/health` returns `{ "status": "ok" }`.
-2. Add the backend production URL to Netlify as `NEXT_PUBLIC_API_URL`.
+2. Add the backend production URL to Vercel as `NEXT_PUBLIC_API_URL`.
 3. Redeploy the frontend after setting its environment variables.
 4. Run the seed once against the production database if you want the demo college data.
 5. Confirm `/`, `/colleges`, `/compare`, `/saved`, `/help`, and `/college/[slug]` load without runtime errors.
