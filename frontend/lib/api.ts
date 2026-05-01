@@ -17,6 +17,7 @@ import type {
 } from "@/types/api";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const fallbackApiUrl = "http://localhost:4000";
 
 export const api = axios.create({
   baseURL,
@@ -46,7 +47,7 @@ export type HelpQuestionFilters = {
 export const getApiErrorMessage = (error: unknown) => {
   const axiosError = error as AxiosError<ApiErrorResponse>;
   if (axiosError.code === "ERR_NETWORK") {
-    return "Unable to reach the server. Please make sure the backend is running on http://localhost:4000.";
+    return `Unable to reach the server. Please make sure the backend is running at ${baseURL ?? fallbackApiUrl}.`;
   }
   return axiosError.response?.data?.error?.message ?? "Something went wrong";
 };

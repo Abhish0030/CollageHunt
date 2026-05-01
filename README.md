@@ -71,7 +71,7 @@ This repository is prepared for Git-based deployment. You still need your own Po
 
 ### Backend
 
-Create `backend/.env` using `backend/.env.example`.
+Create `backend/.env` for local development using `backend/.env.example`.
 
 ```env
 DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres"
@@ -100,7 +100,7 @@ If you want the "Continue with Google" button to go straight to Google, make sur
 
 ### Frontend
 
-Create `frontend/.env.local` using `frontend/.env.example`.
+Create `frontend/.env.local` for local development using `frontend/.env.example`.
 
 ```env
 NEXT_PUBLIC_API_URL="http://localhost:4000"
@@ -187,87 +187,85 @@ npm run build:frontend
 
 ## Deployment
 
-This repo is a two-app setup:
+This repository is ready for a split GitHub deployment:
 
-- `frontend/`: Next.js 14 app
-- `backend/`: Express + Prisma API
+- `frontend/` -> Netlify
+- `backend/` -> Render
 
-Deploy them as two separate projects from the same GitHub repository.
+The backend host above is based on the deployment target that best matches your request. If by "blender" you meant a different provider, the code changes here still prepare the backend for a standard Node.js host with environment variables, Prisma migrations, and a health check.
 
-### Vercel setup
+### Frontend on Netlify
 
-Create two Vercel projects from the same repo:
+The frontend now includes [frontend/netlify.toml](/c:/Users/Abhishek/Gradly/frontend/netlify.toml) for a GitHub-connected Netlify deploy.
 
-1. Frontend project
-- Root Directory: `frontend`
-- Install Command: `npm install`
-- Build Command: `npm run build`
-- Output setting: leave the Vercel default for Next.js
+Netlify site settings:
 
-2. Backend project
-- Root Directory: `backend`
-- Install Command: `npm install`
-- Build Command: `npm run build`
-- Output setting: leave the Vercel default
-- Vercel entrypoint: `api/index.ts`
-- Routing config: `backend/vercel.json`
+1. Connect the same GitHub repository.
+2. Set the Package directory to `frontend`.
+3. Leave the Base directory as the repo root `/`.
+4. Build command: `npm run build`
+5. Node version: `20`
 
-Backend environment variables for Vercel:
+Frontend environment variables on Netlify:
+
+```env
+NEXT_PUBLIC_API_URL="https://your-backend-domain.onrender.com"
+NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT].supabase.co"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
+```
+
+### Backend on Render
+
+The repo now includes [render.yaml](/c:/Users/Abhishek/Gradly/render.yaml) so Render can create the backend service directly from GitHub.
+
+Render service settings from the blueprint:
+
+1. Service type: `Web Service`
+2. Root directory: `backend`
+3. Build command: `npm install && npm run build`
+4. Pre-deploy command: `npm run prisma:deploy`
+5. Start command: `npm run start`
+6. Health check path: `/health`
+
+Backend environment variables on Render:
 
 ```env
 DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres"
 JWT_SECRET="replace-with-a-strong-secret"
-PORT=4000
-CORS_ORIGIN="https://your-frontend-domain.vercel.app"
-FRONTEND_ORIGIN="https://your-frontend-domain.vercel.app"
+CORS_ORIGIN="https://your-frontend-domain.netlify.app"
+FRONTEND_ORIGIN="https://your-frontend-domain.netlify.app"
 NODE_ENV="production"
 ISSUER_BASE_URL="https://your-auth0-tenant.us.auth0.com"
 CLIENT_ID="your-auth0-client-id"
 CLIENT_SECRET="your-auth0-client-secret"
 SECRET="replace-with-a-long-random-auth0-session-secret"
-BASE_URL="https://your-backend-domain.vercel.app"
+BASE_URL="https://your-backend-domain.onrender.com"
 AUTH0_GOOGLE_CONNECTION="google-oauth2"
 AUTH0_HTTP_TIMEOUT=15000
 AUTH0_GOOGLE_PROMPT="select_account"
 ```
 
-Frontend environment variables for Vercel:
+Notes:
 
-```env
-NEXT_PUBLIC_API_URL="https://your-backend-domain.vercel.app"
-NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT].supabase.co"
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
-```
+- Do not hardcode `PORT` on Render unless you have a specific reason. Render provides it automatically.
+- The pre-deploy migration command applies checked-in Prisma migrations before the new version starts.
+- Seed production data once after the first successful deploy with `npx ts-node prisma/seed.ts` from `backend/`.
 
-### Netlify setup
+### Auth0 production URLs
 
-Netlify is ready for the frontend app in `frontend/`.
+When the backend and frontend are live, update your Auth0 application settings to use the exact deployed domains:
 
-Frontend project settings on Netlify:
-
-1. Base directory: `frontend`
-2. Build command: `npm run build`
-3. Publish directory: `.next`
-
-Frontend environment variables for Netlify:
-
-```env
-NEXT_PUBLIC_API_URL="https://your-backend-domain.vercel.app"
-NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT].supabase.co"
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
-```
-
-Use Vercel for the backend in this repo. The backend is an Express server with Prisma and PostgreSQL, which fits the current Vercel deployment path in this codebase more directly than a Netlify migration.
+1. Allowed Callback URLs: `https://your-backend-domain.onrender.com/api/auth/auth0/callback`
+2. Allowed Logout URLs: `https://your-frontend-domain.netlify.app`
+3. Allowed Web Origins: `https://your-frontend-domain.netlify.app`
 
 ### Production checklist
 
-1. Deploy the backend first and verify `GET /health` returns `{ "status": "ok" }`.
-2. Run `prisma migrate deploy` as part of backend startup.
-3. Seed production data once using `npx ts-node prisma/seed.ts` from `backend/` against the production database.
-4. Set the frontend `NEXT_PUBLIC_API_URL` to the deployed backend URL.
-5. Update Auth0 Allowed Callback URLs to include `https://your-backend-domain.vercel.app/api/auth/auth0/callback`.
-6. Update Auth0 Allowed Logout URLs and Allowed Web Origins to include your deployed frontend domain.
-7. Confirm `/`, `/colleges`, `/compare`, `/saved`, and `/college/[slug]` load without runtime errors.
+1. Deploy the backend first and confirm `https://your-backend-domain.onrender.com/health` returns `{ "status": "ok" }`.
+2. Add the backend production URL to Netlify as `NEXT_PUBLIC_API_URL`.
+3. Redeploy the frontend after setting its environment variables.
+4. Run the seed once against the production database if you want the demo college data.
+5. Confirm `/`, `/colleges`, `/compare`, `/saved`, `/help`, and `/college/[slug]` load without runtime errors.
 
 ## Verification Completed In This Workspace
 
@@ -279,7 +277,7 @@ Use Vercel for the backend in this repo. The backend is an Express server with P
 
 - Real `prisma migrate dev` execution against PostgreSQL
 - Real seed execution against PostgreSQL
-- Live deployment to Vercel + Netlify
+- Live deployment to Render + Netlify
 - Full authenticated smoke test against running services
 
 Those steps are blocked here because no GitHub remote, no GitHub CLI session, no reachable production PostgreSQL instance, and no deployment credentials were available during the session.

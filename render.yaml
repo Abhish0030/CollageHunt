@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: gradly-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    preDeployCommand: npm run prisma:deploy
+    startCommand: npm run start
+    healthCheckPath: /health
