@@ -208,7 +208,9 @@ Create two Vercel projects from the same repo:
 - Root Directory: `backend`
 - Install Command: `npm install`
 - Build Command: `npm run build`
-- Start Command: `npm run start:prod`
+- Output setting: leave the Vercel default
+- Vercel entrypoint: `api/index.ts`
+- Routing config: `backend/vercel.json`
 
 Backend environment variables for Vercel:
 
