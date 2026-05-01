@@ -13,6 +13,26 @@ const getGoogleConnectionName = () => process.env.AUTH0_GOOGLE_CONNECTION ?? "go
 const getGooglePrompt = () => process.env.AUTH0_GOOGLE_PROMPT ?? "select_account";
 const getIssuerBaseUrl = () => process.env.ISSUER_BASE_URL?.replace(/\/+$/, "");
 const isProduction = () => process.env.NODE_ENV === "production";
+const auth0PlaceholderMarkers = [
+  "your-backend-service.onrender.com",
+  "your-backend-domain.onrender.com",
+  "your-frontend-site.netlify.app",
+  "your-frontend-domain.netlify.app",
+  "your-frontend-domain.vercel.app",
+  "your-auth0-tenant.us.auth0.com",
+  "your-auth0-client-id",
+  "your-auth0-client-secret",
+];
+
+const hasPlaceholderValue = (value?: string | null) => {
+  const normalized = value?.trim().toLowerCase();
+
+  if (!normalized) {
+    return true;
+  }
+
+  return auth0PlaceholderMarkers.some((marker) => normalized.includes(marker));
+};
 
 const isAllowedLocalDevelopmentOrigin = (origin: string) => {
   if (isProduction()) {
@@ -84,11 +104,11 @@ const buildAuthorizationParams = (provider?: string, mode?: string) => ({
 
 const isConfigured = () =>
   Boolean(
-    getIssuerBaseUrl() &&
-      process.env.CLIENT_ID &&
-      process.env.CLIENT_SECRET &&
-      process.env.SECRET &&
-      process.env.BASE_URL,
+    !hasPlaceholderValue(getIssuerBaseUrl()) &&
+      !hasPlaceholderValue(process.env.CLIENT_ID) &&
+      !hasPlaceholderValue(process.env.CLIENT_SECRET) &&
+      !hasPlaceholderValue(process.env.SECRET) &&
+      !hasPlaceholderValue(process.env.BASE_URL),
   );
 
 const sanitizeReturnTo = (value: unknown) => {
