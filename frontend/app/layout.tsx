@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CompareTray } from "@/components/CompareTray";
 import { MegaMenu } from "@/components/MegaMenu";
 import { Navbar } from "@/components/Navbar";
@@ -30,6 +31,7 @@ export default function RootLayout({
             <CompareTray />
           </div>
         </AppProviders>
+        <SpeedInsights />
       </body>
     </html>
   );
