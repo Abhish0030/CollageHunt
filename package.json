@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build:netlify": "npm --prefix frontend run build",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend run dev",
     "build:frontend": "npm --prefix frontend run build",
     "build:backend": "npm --prefix backend run build",
-    "build": "npm run build:backend && npm run build:frontend",
+    "build": "node scripts/build.js",
     "seed": "npm --prefix backend run seed"
   }
 }

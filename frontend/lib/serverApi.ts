@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
+import { getApiBaseUrl } from "@/lib/env";
 import type { ApiResponse, College } from "@/types/api";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const baseURL = getApiBaseUrl();
 
 export const fetchServerColleges = async (path: string) => {
   const response = await fetch(`${baseURL}${path}`, {

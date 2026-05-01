@@ -196,20 +196,20 @@ The backend host above is based on the deployment target that best matches your 
 
 ### Frontend on Netlify
 
-The frontend now includes [frontend/netlify.toml](/c:/Users/Abhishek/Gradly/frontend/netlify.toml) for a GitHub-connected Netlify deploy.
+The repo now includes [netlify.toml](/c:/Users/Abhishek/Gradly/netlify.toml) for a GitHub-connected Netlify deploy from the `frontend/` subdirectory. A matching [frontend/netlify.toml](/c:/Users/Abhishek/Gradly/frontend/netlify.toml) is also kept for local clarity.
 
 Netlify site settings:
 
 1. Connect the same GitHub repository.
-2. Set the Package directory to `frontend`.
-3. Leave the Base directory as the repo root `/`.
-4. Build command: `npm run build`
+2. Base directory: `frontend`
+3. Build command: `npm run build`
+4. Publish directory: leave blank and let the Next.js Netlify plugin manage it.
 5. Node version: `20`
 
 Frontend environment variables on Netlify:
 
 ```env
-NEXT_PUBLIC_API_URL="https://your-backend-domain.onrender.com"
+NEXT_PUBLIC_API_URL="https://gradly-b849.onrender.com"
 NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT].supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
 ```

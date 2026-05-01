@@ -1,6 +1,7 @@
 "use client";
 
 import axios, { AxiosError } from "axios";
+import { getApiBaseUrl, getApiFallbackUrl } from "@/lib/env";
 import type {
   ApiErrorResponse,
   ApiResponse,
@@ -16,8 +17,8 @@ import type {
   User,
 } from "@/types/api";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
-const fallbackApiUrl = "http://localhost:4000";
+const baseURL = getApiBaseUrl();
+const fallbackApiUrl = getApiFallbackUrl();
 
 export const api = axios.create({
   baseURL,
