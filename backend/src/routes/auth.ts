@@ -66,11 +66,12 @@ router.get("/auth0/enabled", async (_req, res, next) => {
 
 router.get("/auth0/config", async (_req, res, next) => {
   try {
+    const enabled = auth0Enabled();
     return sendSuccess(res, {
-      enabled: auth0Enabled(),
-      callbackUrl: getAuth0CallbackUrl(),
-      logoutUrl: getAuth0LogoutUrl(),
-      webOrigin: getAuth0WebOrigin(),
+      enabled,
+      callbackUrl: enabled ? getAuth0CallbackUrl() : null,
+      logoutUrl: enabled ? getAuth0LogoutUrl() : null,
+      webOrigin: enabled ? getAuth0WebOrigin() : null,
     });
   } catch (error) {
     next(error);

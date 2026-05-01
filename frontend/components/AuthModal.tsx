@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -78,6 +78,7 @@ const buildSuggestedPassword = () => {
 export const AuthModal = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [isGoogleAuthAvailable, setIsGoogleAuthAvailable] = useState(false);
   const {
     authMode,
     closeAuthModal,
@@ -106,6 +107,30 @@ export const AuthModal = () => {
     if (!isAuthModalOpen) {
       loginForm.reset();
       registerForm.reset();
+      setIsGoogleAuthAvailable(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadAuth0Config = async () => {
+      try {
+        const config = await fetchAuth0Config();
+
+        if (isMounted) {
+          setIsGoogleAuthAvailable(config.enabled);
+        }
+      } catch {
+        if (isMounted) {
+          setIsGoogleAuthAvailable(false);
+        }
+      }
+    };
+
+    void loadAuth0Config();
+
+    return () => {
+      isMounted = false;
     }
   }, [isAuthModalOpen, loginForm, registerForm]);
 
@@ -174,7 +199,7 @@ export const AuthModal = () => {
       const config = await fetchAuth0Config();
 
       if (!config.enabled) {
-        toast.error("Google login is not configured on the backend yet.");
+        setIsGoogleAuthAvailable(false);
         return;
       }
 
@@ -210,31 +235,33 @@ export const AuthModal = () => {
           </div>
 
           <div className="flex items-center gap-3 self-end sm:self-auto">
-            <button
-              type="button"
-              onClick={handleGoogleAuth}
-              className="inline-flex items-center justify-center gap-3 rounded-full border border-slate-300 px-5 py-3 text-base font-medium text-slate-800 transition hover:bg-slate-50"
-            >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-                <path
-                  fill="#4285F4"
-                  d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.44a5.5 5.5 0 0 1-2.39 3.61v3h3.87c2.27-2.09 3.57-5.17 3.57-8.64Z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.87-3c-1.07.72-2.44 1.15-4.08 1.15-3.14 0-5.8-2.12-6.75-4.96H1.25v3.09A11.99 11.99 0 0 0 12 24Z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.25 14.28A7.22 7.22 0 0 1 4.88 12c0-.79.13-1.56.37-2.28V6.63H1.25A11.99 11.99 0 0 0 0 12c0 1.93.46 3.75 1.25 5.37l4-3.09Z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 4.77c1.76 0 3.34.61 4.59 1.81l3.44-3.44C17.95 1.15 15.23 0 12 0A11.99 11.99 0 0 0 1.25 6.63l4 3.09C6.2 6.89 8.86 4.77 12 4.77Z"
-                />
-              </svg>
-              {isLogin ? "Login with Google" : "Sign up with Google"}
-            </button>
+            {isGoogleAuthAvailable ? (
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                className="inline-flex items-center justify-center gap-3 rounded-full border border-slate-300 px-5 py-3 text-base font-medium text-slate-800 transition hover:bg-slate-50"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <path
+                    fill="#4285F4"
+                    d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.44a5.5 5.5 0 0 1-2.39 3.61v3h3.87c2.27-2.09 3.57-5.17 3.57-8.64Z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.87-3c-1.07.72-2.44 1.15-4.08 1.15-3.14 0-5.8-2.12-6.75-4.96H1.25v3.09A11.99 11.99 0 0 0 12 24Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.25 14.28A7.22 7.22 0 0 1 4.88 12c0-.79.13-1.56.37-2.28V6.63H1.25A11.99 11.99 0 0 0 0 12c0 1.93.46 3.75 1.25 5.37l4-3.09Z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.77c1.76 0 3.34.61 4.59 1.81l3.44-3.44C17.95 1.15 15.23 0 12 0A11.99 11.99 0 0 0 1.25 6.63l4 3.09C6.2 6.89 8.86 4.77 12 4.77Z"
+                  />
+                </svg>
+                {isLogin ? "Login with Google" : "Sign up with Google"}
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={closeAuthModal}
