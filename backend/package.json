@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "prisma generate && tsc -p tsconfig.json",
+    "build": "prisma generate && tsc -p tsconfig.json && node scripts/copy-prisma-client.js",
     "start": "node dist/src/index.js",
     "start:prod": "prisma migrate deploy && node dist/src/index.js",
     "postinstall": "prisma generate",
