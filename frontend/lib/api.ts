@@ -166,12 +166,14 @@ export const getAuth0LoginUrl = (
   const target = returnTo ?? (typeof window !== "undefined" ? window.location.href : "/");
   const providerQuery = provider ? `&provider=${encodeURIComponent(provider)}` : "";
   const modeQuery = mode ? `&mode=${encodeURIComponent(mode)}` : "";
-  return `${baseURL}/api/auth/auth0/login?returnTo=${encodeURIComponent(target)}${providerQuery}${modeQuery}`;
+  const authBaseUrl = baseURL || "";
+  return `${authBaseUrl}/api/auth/auth0/login?returnTo=${encodeURIComponent(target)}${providerQuery}${modeQuery}`;
 };
 
 export const getAuth0LogoutUrl = (returnTo?: string) => {
   const target = returnTo ?? (typeof window !== "undefined" ? window.location.origin : "/");
-  return `${baseURL}/api/auth/auth0/logout?returnTo=${encodeURIComponent(target)}`;
+  const authBaseUrl = baseURL || "";
+  return `${authBaseUrl}/api/auth/auth0/logout?returnTo=${encodeURIComponent(target)}`;
 };
 
 export const fetchSavedColleges = async () => {
