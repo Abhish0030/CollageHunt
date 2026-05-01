@@ -75,6 +75,7 @@ Create `backend/.env` for local development using `backend/.env.example`.
 
 ```env
 DATABASE_URL="postgresql://postgres.[YOUR-PROJECT]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres?connect_timeout=30"
+DIRECT_URL="postgresql://postgres.[YOUR-PROJECT]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres?connect_timeout=30"
 JWT_SECRET="replace-with-a-strong-secret"
 PORT=4000
 CORS_ORIGIN="http://localhost:3000"
@@ -239,6 +240,7 @@ Backend environment variables on Render:
 
 ```env
 DATABASE_URL="postgresql://postgres.[YOUR-PROJECT]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres?connect_timeout=30"
+DIRECT_URL="postgresql://postgres.[YOUR-PROJECT]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres?connect_timeout=30"
 JWT_SECRET="replace-with-a-strong-secret"
 CORS_ORIGIN="https://your-frontend-domain.vercel.app"
 FRONTEND_ORIGIN="https://your-frontend-domain.vercel.app"
@@ -258,7 +260,9 @@ Notes:
 - Do not hardcode `PORT` on Render unless you have a specific reason. Render provides it automatically.
 - The pre-deploy migration command applies checked-in Prisma migrations before the new version starts.
 - Seed production data once after the first successful deploy with `npx ts-node prisma/seed.ts` from `backend/`.
-- For Render + Supabase, use the Supabase Session pooler string on port `5432`, not the direct `db.[PROJECT].supabase.co:5432` host. Supabase documents the direct host as IPv6-first, while the pooler is the recommended IPv4-friendly fallback for persistent servers when direct connectivity is not available.
+- For Render + Supabase, use the Supabase Session pooler string on port `5432`, not the direct `db.[PROJECT].supabase.co:5432` host, for `DATABASE_URL`.
+- Set `DIRECT_URL` too, so Prisma CLI and `prisma migrate deploy` can use a dedicated migration connection when needed.
+- Supabase documents the direct host as IPv6-first, while the pooler is the recommended IPv4-friendly fallback for persistent servers when direct connectivity is not available.
 
 ### Auth0 production URLs
 
