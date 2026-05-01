@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model College {
+  id              Int            @id @default(autoincrement())
+  slug            String         @unique
+  name            String
+  city            String
+  state           String
+  feesPerYear     Int
+  rating          Float
+  naacGrade       String
+  establishedYear Int
+  website         String?
+  placementPct    Int
+  avgPackage      Int
+  highestPackage  Int
+  topRecruiters   String[]
+  courses         Course[]
+  reviews         Review[]
+  savedBy         SavedCollege[]
+  createdAt       DateTime       @default(now())
+}
+
+model Course {
+  id        Int     @id @default(autoincrement())
+  collegeId Int
+  college   College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  name      String
+  duration  Int
+  seats     Int
+  fees      Int
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  name            String
+  email           String           @unique
+  phone           String?          @unique
+  city            String?
+  studyingIn      String?
+  passwordHash    String
+  saved           SavedCollege[]
+  reviews         Review[]
+  questionsAsked  Question[]       @relation("QuestionsAsked")
+  answersGiven    Answer[]         @relation("AnswersGiven")
+  questionUpvotes QuestionUpvote[]
+  answerUpvotes   AnswerUpvote[]
+  createdAt       DateTime         @default(now())
+}
+
+model SavedCollege {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  collegeId Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college   College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, collegeId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  collegeId Int
+  userId    Int
+  rating    Int
+  body      String
+  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Newsletter {
+  id        Int      @id @default(autoincrement())
+  email     String
+  mobile    String?
+  course    String?
+  createdAt DateTime @default(now())
+}
+
+model Question {
+  id        Int              @id @default(autoincrement())
+  title     String
+  body      String?          @db.Text
+  category  String
+  tags      String[]
+  authorId  Int
+  author    User             @relation("QuestionsAsked", fields: [authorId], references: [id])
+  answers   Answer[]
+  upvotes   Int              @default(0)
+  views     Int              @default(0)
+  isPinned  Boolean          @default(false)
+  isSolved  Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  upvotedBy QuestionUpvote[]
+
+  @@index([authorId])
+  @@index([category])
+  @@index([isPinned, isSolved, createdAt])
+}
+
+model Answer {
+  id         Int            @id @default(autoincrement())
+  body       String         @db.Text
+  questionId Int
+  question   Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  authorId   Int
+  author     User           @relation("AnswersGiven", fields: [authorId], references: [id])
+  upvotes    Int            @default(0)
+  isAccepted Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  upvotedBy  AnswerUpvote[]
+
+  @@index([questionId])
+  @@index([authorId])
+  @@index([isAccepted, upvotes, createdAt])
+}
+
+model QuestionUpvote {
+  id         Int      @id @default(autoincrement())
+  questionId Int
+  userId     Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([questionId, userId])
+  @@index([userId])
+}
+
+model AnswerUpvote {
+  id        Int      @id @default(autoincrement())
+  answerId  Int
+  userId    Int
+  answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([answerId, userId])
+  @@index([userId])
+}
