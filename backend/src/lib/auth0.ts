@@ -28,6 +28,15 @@ const isAllowedLocalDevelopmentOrigin = (origin: string) => {
   }
 };
 
+const isAllowedVercelOrigin = (origin: string) => {
+  try {
+    const parsedUrl = new URL(origin);
+    return parsedUrl.protocol === "https:" && parsedUrl.hostname.endsWith(".vercel.app");
+  } catch {
+    return false;
+  }
+};
+
 export const getAllowedFrontendOrigins = () => {
   const configuredOrigins = (process.env.CORS_ORIGIN ?? DEFAULT_FRONTEND_ORIGIN)
     .split(",")
@@ -43,7 +52,9 @@ export const getAllowedFrontendOrigins = () => {
 };
 
 export const isAllowedFrontendOrigin = (origin: string) =>
-  getAllowedFrontendOrigins().includes(origin) || isAllowedLocalDevelopmentOrigin(origin);
+  getAllowedFrontendOrigins().includes(origin) ||
+  isAllowedLocalDevelopmentOrigin(origin) ||
+  isAllowedVercelOrigin(origin);
 
 export const getFrontendOrigin = () => getConfiguredFrontendOrigin();
 const getAuth0HttpTimeout = () => {

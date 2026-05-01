@@ -210,7 +210,7 @@ Vercel project settings:
 Frontend environment variables on Vercel:
 
 ```env
-NEXT_PUBLIC_API_URL="https://gradly-b849.onrender.com"
+NEXT_PUBLIC_API_URL="https://gradly-p849.onrender.com"
 NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT].supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
 ```
