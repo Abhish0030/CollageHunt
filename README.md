@@ -10,7 +10,7 @@ Here’s your **updated README.md** (ready to copy-paste) 👇
 
 > *Built with Next.js 14, Express, Prisma & PostgreSQL*
 
-**🌐 Live App:** *(Add your deployed link here)*
+**🌐 Live App:** *(https://gradly-doytmdxgc-abhish0030s-projects.vercel.app/)*
 
 <img src="frontend/public/gradly-banner.png" alt="Gradly Banner" width="100%" />
 
