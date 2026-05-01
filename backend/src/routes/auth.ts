@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Prisma } from "../generated/prisma";
 import { z } from "zod";
 import {
   auth0Enabled,
@@ -55,6 +56,144 @@ const loginSchema = z.object({
   identifier: z.string().trim().min(3).max(120),
   password: z.string().min(8).max(128),
 });
+
+const userAuthSelect = {
+  id: true,
+  name: true,
+  email: true,
+  passwordHash: true,
+  createdAt: true,
+} as const;
+
+const userProfileSelect = {
+  id: true,
+  name: true,
+  email: true,
+  phone: true,
+  city: true,
+  studyingIn: true,
+  createdAt: true,
+} as const;
+
+const userProfileFallbackSelect = {
+  id: true,
+  name: true,
+  email: true,
+  createdAt: true,
+} as const;
+
+const isMissingUserProfileColumnError = (error: unknown) => {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2022") {
+    return true;
+  }
+
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+  return (
+    message.includes("column") &&
+    (message.includes("phone") || message.includes("city") || message.includes("studyingin"))
+  );
+};
+
+const toAuthResponseUser = <
+  T extends {
+    id: number;
+    name: string;
+    email: string;
+    createdAt: Date;
+    phone?: string | null;
+    city?: string | null;
+    studyingIn?: string | null;
+  },
+>(
+  user: T,
+) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  phone: user.phone ?? null,
+  city: user.city ?? null,
+  studyingIn: user.studyingIn ?? null,
+  createdAt: user.createdAt,
+});
+
+const findUserForAuth = async (identifier: string, isEmailLogin: boolean) => {
+  if (isEmailLogin) {
+    return prisma.user.findFirst({
+      where: { email: identifier.toLowerCase() },
+      select: userAuthSelect,
+    });
+  }
+
+  return prisma.user.findFirst({
+    where: { phone: normalizePhoneNumber(identifier) },
+    select: userAuthSelect,
+  });
+};
+
+const createUserProfile = async (payload: z.infer<typeof registerSchema>) => {
+  try {
+    return await prisma.user.create({
+      data: {
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        city: payload.city,
+        studyingIn: payload.studyingIn,
+        passwordHash: await hashPassword(payload.password),
+      },
+      select: userProfileSelect,
+    });
+  } catch (error) {
+    if (!isMissingUserProfileColumnError(error)) {
+      throw error;
+    }
+
+    return prisma.user.create({
+      data: {
+        name: payload.name,
+        email: payload.email,
+        passwordHash: await hashPassword(payload.password),
+      },
+      select: userProfileFallbackSelect,
+    });
+  }
+};
+
+const findUserProfileById = async (userId: number) => {
+  try {
+    return await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        ...userProfileSelect,
+        _count: {
+          select: {
+            saved: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    if (!isMissingUserProfileColumnError(error)) {
+      throw error;
+    }
+
+    return prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        ...userProfileFallbackSelect,
+        _count: {
+          select: {
+            saved: true,
+          },
+        },
+      },
+    });
+  }
+};
 
 router.get("/auth0/enabled", async (_req, res, next) => {
   try {
@@ -117,11 +256,29 @@ router.get("/auth0/logout", async (req, res, next) => {
 router.post("/register", async (req, res, next) => {
   try {
     const payload = registerSchema.parse(req.body);
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: payload.email }, { phone: payload.phone }],
-      },
-    });
+    let existingUser = null;
+
+    try {
+      existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [{ email: payload.email }, { phone: payload.phone }],
+        },
+        select: {
+          email: true,
+        },
+      });
+    } catch (error) {
+      if (!isMissingUserProfileColumnError(error)) {
+        throw error;
+      }
+
+      existingUser = await prisma.user.findFirst({
+        where: { email: payload.email },
+        select: {
+          email: true,
+        },
+      });
+    }
 
     if (existingUser) {
       if (existingUser.email === payload.email) {
@@ -131,25 +288,7 @@ router.post("/register", async (req, res, next) => {
       throw new AppError(409, "CONFLICT", "An account with this mobile number already exists");
     }
 
-    const user = await prisma.user.create({
-      data: {
-        name: payload.name,
-        email: payload.email,
-        phone: payload.phone,
-        city: payload.city,
-        studyingIn: payload.studyingIn,
-        passwordHash: await hashPassword(payload.password),
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        city: true,
-        studyingIn: true,
-        createdAt: true,
-      },
-    });
+    const user = await createUserProfile(payload);
 
     const token = signToken({
       userId: user.id,
@@ -159,7 +298,7 @@ router.post("/register", async (req, res, next) => {
     });
 
     res.cookie(getTokenCookieName(), token, getCookieOptions());
-    return sendCreated(res, user);
+    return sendCreated(res, toAuthResponseUser(user));
   } catch (error) {
     next(error);
   }
@@ -171,11 +310,24 @@ router.post("/login", async (req, res, next) => {
     const normalizedIdentifier = payload.identifier.trim();
     const isEmailLogin = normalizedIdentifier.includes("@");
 
-    const user = await prisma.user.findFirst({
-      where: isEmailLogin
-        ? { email: normalizedIdentifier.toLowerCase() }
-        : { phone: normalizePhoneNumber(normalizedIdentifier) },
-    });
+    let user = null;
+
+    try {
+      user = await findUserForAuth(normalizedIdentifier, isEmailLogin);
+    } catch (error) {
+      if (!isMissingUserProfileColumnError(error)) {
+        throw error;
+      }
+
+      if (!isEmailLogin) {
+        throw new AppError(503, "BAD_REQUEST", "Phone login is temporarily unavailable");
+      }
+
+      user = await prisma.user.findFirst({
+        where: { email: normalizedIdentifier.toLowerCase() },
+        select: userAuthSelect,
+      });
+    }
 
     if (!user || !(await comparePassword(payload.password, user.passwordHash))) {
       throw new AppError(401, "UNAUTHORIZED", "Invalid credentials");
@@ -189,14 +341,13 @@ router.post("/login", async (req, res, next) => {
     });
 
     res.cookie(getTokenCookieName(), token, getCookieOptions());
+    const fullUserProfile = await findUserProfileById(user.id);
+    if (!fullUserProfile) {
+      throw new AppError(404, "NOT_FOUND", "User not found");
+    }
+
     return sendSuccess(res, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      city: user.city,
-      studyingIn: user.studyingIn,
-      createdAt: user.createdAt,
+      ...toAuthResponseUser(fullUserProfile),
       authProvider: "credentials",
     });
   } catch (error) {
@@ -218,30 +369,15 @@ router.post("/logout", async (_req, res, next) => {
 
 router.get("/me", authMiddleware, async (req, res, next) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user?.userId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        city: true,
-        studyingIn: true,
-        createdAt: true,
-        _count: {
-          select: {
-            saved: true,
-          },
-        },
-      },
-    });
+    const user = await findUserProfileById(req.user!.userId);
 
     if (!user) {
       throw new AppError(404, "NOT_FOUND", "User not found");
     }
 
     return sendSuccess(res, {
-      ...user,
+      ...toAuthResponseUser(user),
+      _count: user._count,
       authProvider: req.user?.authProvider ?? "credentials",
     });
   } catch (error) {
