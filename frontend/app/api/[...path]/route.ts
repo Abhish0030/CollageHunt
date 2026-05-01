@@ -4,6 +4,7 @@ import { getBackendApiBaseUrl } from "@/lib/env";
 export const dynamic = "force-dynamic";
 
 const hopByHopHeaders = new Set([
+  "accept-encoding",
   "connection",
   "content-length",
   "host",
@@ -48,7 +49,12 @@ const proxyRequest = async (request: NextRequest, path: string[]) => {
   upstreamResponse.headers.forEach((value, key) => {
     const normalizedKey = key.toLowerCase();
 
-    if (normalizedKey === "set-cookie" || normalizedKey === "content-length" || normalizedKey === "transfer-encoding") {
+    if (
+      normalizedKey === "content-encoding" ||
+      normalizedKey === "set-cookie" ||
+      normalizedKey === "content-length" ||
+      normalizedKey === "transfer-encoding"
+    ) {
       return;
     }
 
