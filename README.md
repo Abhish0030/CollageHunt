@@ -12,7 +12,7 @@ Here’s your **updated README.md** (ready to copy-paste) 👇
 
 **🌐 Live App:** *(https://gradly-doytmdxgc-abhish0030s-projects.vercel.app/)*
 
-<img src="frontend/public/readme-banner.svg" alt="CollageHunt Banner" width="100%" />
+<img src="frontend/public/readme-banner.png" alt="CollageHunt Banner" width="100%" />
 
 ---
 
