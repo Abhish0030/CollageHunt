@@ -4,7 +4,7 @@ import app from "./app";
 const port = Number(process.env.PORT ?? 4000);
 
 app.listen(port, () => {
-  console.log(`Gradly backend running on port ${port}`);
+  console.log(`CollageHunt backend running on port ${port}`);
   if (auth0Enabled()) {
     console.log(`Auth0 callback URL: ${getAuth0CallbackUrl()}`);
   }

@@ -97,10 +97,28 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-white/70 bg-white/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="container-shell flex h-20 items-center justify-between gap-4">
-          <Link href="/" className="text-2xl font-black tracking-tight text-slate-900">
-            Grad<span className="text-blue-700">ly</span>
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="CollageHunt home">
+            <svg
+              viewBox="0 0 56 56"
+              aria-hidden="true"
+              className="h-10 w-10 sm:h-11 sm:w-11"
+            >
+              <path d="M28 6L6 14L12 17V24L14 22V18L28 12L42 18V22L44 24V17L50 14L28 6Z" fill="#153A84" />
+              <path d="M42 18L40 31H46L44 18H42Z" fill="#153A84" />
+              <circle cx="28" cy="29" r="12" stroke="#F97316" strokeWidth="5" fill="white" />
+              <circle cx="28" cy="29" r="6.5" stroke="#153A84" strokeWidth="3" fill="white" />
+              <path d="M19 38L9 47" stroke="#F97316" strokeWidth="5" strokeLinecap="round" />
+            </svg>
+            <span className="flex flex-col leading-none">
+              <span className="text-[1.55rem] font-extrabold tracking-tight text-[#153A84]">
+                College<span className="text-[#F97316]">Hunt</span>
+              </span>
+              <span className="mt-1 text-[11px] font-medium tracking-[0.01em] text-slate-500 sm:text-xs">
+                Discover · Compare · Decide
+              </span>
+            </span>
           </Link>
 
           <form
@@ -233,8 +251,8 @@ export const Navbar = () => {
               <h2 className="text-xl font-semibold text-slate-900">Confirm logout</h2>
               <p className="mt-3 text-sm leading-6 text-slate-600">
                 {user.authProvider === "auth0"
-                  ? "You will be signed out of Gradly and your Google/Auth0 session will be cleared."
-                  : "You will be signed out of your Gradly account on this device."}
+                  ? "You will be signed out of CollageHunt and your Google/Auth0 session will be cleared."
+                  : "You will be signed out of your CollageHunt account on this device."}
               </p>
               <div className="mt-6 flex justify-end gap-3">
                 <button

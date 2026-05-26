@@ -1,10 +1,10 @@
-Got it — you want your **Gradly README** upgraded to look clean, modern, and attractive like your **UniLink README** (with banner, sections, polished structure).
+Got it — you want your **CollageHunt README** upgraded to look clean, modern, and attractive like your **UniLink README** (with banner, sections, polished structure).
 
 Here’s your **updated README.md** (ready to copy-paste) 👇
 
 ---
 
-# 🎓 Gradly
+# 🎓 CollageHunt
 
 **Smart College Discovery & Comparison Platform**
 
@@ -12,17 +12,17 @@ Here’s your **updated README.md** (ready to copy-paste) 👇
 
 **🌐 Live App:** *(https://gradly-doytmdxgc-abhish0030s-projects.vercel.app/)*
 
-<img src="frontend/public/gradly-banner.png" alt="Gradly Banner" width="100%" />
+<img src="frontend/public/readme-banner.svg" alt="CollageHunt Banner" width="100%" />
 
 ---
 
-## 📌 What is Gradly?
+## 📌 What is CollageHunt?
 
-Gradly is a modern **college discovery platform** designed to help students explore, compare, and save colleges across India.
+CollageHunt is a modern **college discovery platform** designed to help students explore, compare, and save colleges across India.
 
 It simplifies the decision-making process by providing structured college data, comparison tools, and personalized features like saved colleges and filters.
 
-Gradly is inspired by platforms like Careers360 and CollegeDunia, but built as a **fast, scalable, and developer-focused MVP**.
+CollageHunt is inspired by platforms like Careers360 and CollegeDunia, but built as a **fast, scalable, and developer-focused MVP**.
 
 ---
 
@@ -96,8 +96,8 @@ backend/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Abhish0030/Gradly.git
-cd Gradly
+git clone https://github.com/Abhish0030/CollageHunt.git
+cd CollageHunt
 ```
 
 ### 2. Install dependencies

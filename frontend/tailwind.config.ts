@@ -17,7 +17,7 @@ const config: Config = {
         sans: ["var(--font-inter)", "Inter", "sans-serif"],
       },
       boxShadow: {
-        card: "0 20px 48px -30px rgba(15, 23, 42, 0.4)",
+        card: "0 1px 2px rgba(15, 23, 42, 0.08)",
       },
     },
   },

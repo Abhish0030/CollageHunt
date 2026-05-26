@@ -17,7 +17,7 @@ const cards = [
   {
     title: "Ranking",
     subtitle: "College ranked based on real data",
-    content: "Gradly - 2899   NIRF - 1780   Outlook - 1388",
+    content: "CollageHunt - 2899   NIRF - 1780   Outlook - 1388",
     link: "Top Ranked Colleges in India",
     icon: Trophy,
     accent: "bg-amber-50 text-amber-700",

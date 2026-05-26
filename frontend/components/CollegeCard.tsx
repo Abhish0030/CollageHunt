@@ -11,9 +11,11 @@ import { useCompareStore } from "@/store/compareStore";
 import type { College } from "@/types/api";
 import { StarRating } from "./StarRating";
 
+const isAuthRequiredError = (error: unknown) => error instanceof Error && error.message === "AUTH_REQUIRED";
+
 export const CollegeCard = ({ college }: { college: College }) => {
   const queryClient = useQueryClient();
-  const { addCollege, ids } = useCompareStore();
+  const { addCollege, ids, removeCollege } = useCompareStore();
   const { addSavedCollegeId, openAuthModal, removeSavedCollegeId, savedCollegeIds, setSavedCollegeIds, setUser, user } =
     useAuthStore();
   const isSaved = savedCollegeIds.includes(college.id);
@@ -50,7 +52,7 @@ export const CollegeCard = ({ college }: { college: College }) => {
       await queryClient.invalidateQueries({ queryKey: ["saved-colleges"] });
     },
     onError: (error, _variables, context) => {
-      if ((error as Error).message === "AUTH_REQUIRED") {
+      if (isAuthRequiredError(error)) {
         return;
       }
       if (context && "previous" in context) {
@@ -68,72 +70,90 @@ export const CollegeCard = ({ college }: { college: College }) => {
   });
 
   return (
-    <article className="group rounded-xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-1 hover:shadow-xl">
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
-          <Link href={`/college/${college.slug}`} className="text-lg font-semibold text-slate-900 transition hover:text-blue-700">
-            {college.name}
-          </Link>
-          <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
-            <MapPin size={16} />
-            <span>
-              {college.city}, {college.state}
-            </span>
+    <article className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <Link
+              href={`/colleges/${college.slug}`}
+              className="block text-xl font-semibold leading-snug text-slate-900 transition hover:text-blue-700"
+            >
+              {college.name}
+            </Link>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+              <span className="inline-flex items-center gap-2">
+                <MapPin size={16} />
+                {college.city}, {college.state}
+              </span>
+              {college.stream ? <span>{college.stream}</span> : null}
+              {college.ownership ? <span>{college.ownership}</span> : null}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const currentSaved = useAuthStore.getState().savedCollegeIds.includes(college.id);
+              toggleSave.mutate({ shouldUnsave: currentSaved });
+            }}
+            className={`rounded-full border p-2 transition ${
+              isSaved
+                ? "border-blue-100 bg-blue-50 text-blue-700"
+                : "border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-700"
+            }`}
+            aria-label={isSaved ? "Unsave college" : "Save college"}
+          >
+            <Bookmark fill={isSaved ? "currentColor" : "none"} size={18} />
+          </button>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl bg-slate-50 p-4 text-sm">
+            <p className="text-slate-500">Annual fees</p>
+            <p className="mt-1 font-semibold text-slate-900">{formatCurrency(college.feesPerYear)}</p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-4 text-sm">
+            <p className="text-slate-500">Top course</p>
+            <p className="mt-1 font-medium text-slate-900">{getTopCourse(college.courses)}</p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-4 text-sm">
+            <p className="text-slate-500">Rating</p>
+            <div className="mt-1 flex items-center gap-2">
+              <StarRating rating={college.rating} />
+              <span className="font-semibold text-slate-900">{college.rating.toFixed(1)}</span>
+            </div>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-4 text-sm">
+            <p className="text-slate-500">NIRF</p>
+            <p className="mt-1 font-semibold text-slate-900">
+              {college.nirfRank ? `#${college.nirfRank}` : "Unranked"}
+            </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            const currentSaved = useAuthStore.getState().savedCollegeIds.includes(college.id);
-            toggleSave.mutate({ shouldUnsave: currentSaved });
-          }}
-          className={`rounded-full border p-2 transition ${
-            isSaved
-              ? "border-blue-100 bg-blue-50 text-blue-700"
-              : "border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-700"
-          }`}
-          aria-label={isSaved ? "Unsave college" : "Save college"}
-        >
-          <Bookmark fill={isSaved ? "currentColor" : "none"} size={18} />
-        </button>
       </div>
 
-      <div className="mb-5 grid gap-3 rounded-xl bg-slate-50 p-4 text-sm">
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500">Annual fees</span>
-          <span className="font-semibold text-slate-900">{formatCurrency(college.feesPerYear)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500">Top course</span>
-          <span className="font-medium text-slate-800">{getTopCourse(college.courses)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500">Rating</span>
-          <div className="flex items-center gap-2">
-            <StarRating rating={college.rating} />
-            <span className="font-semibold text-slate-900">{college.rating.toFixed(1)}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Link href={`/college/${college.slug}`} className="button-primary flex-1">
+      <div className="mt-5 flex w-full flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row">
+        <Link href={`/colleges/${college.slug}`} className="button-primary w-full">
           View details
         </Link>
         <button
           type="button"
           onClick={() => {
             if (!isCompared && ids.length >= 3) {
-              toast.error("You can compare up to 3 colleges at a time");
+              toast.error("You can shortlist up to 3 colleges at a time");
+              return;
+            }
+            if (isCompared) {
+              removeCollege(college.id);
+              toast.success("Removed from shortlist");
               return;
             }
             addCollege(college.id);
-            toast.success(isCompared ? "Already in compare tray" : "Added to compare");
+            toast.success("Added to shortlist");
           }}
-          className="button-secondary flex-1"
+          className="button-secondary w-full"
         >
           <GitCompareArrows className="mr-2" size={16} />
-          Add to Compare
+          {isCompared ? "Remove shortlist" : "Shortlist"}
         </button>
       </div>
     </article>

@@ -34,11 +34,11 @@ export const reviewBodies = [
 export const reviewRatings = [5, 4, 4, 3, 5] as const;
 
 export const reviewUsers = [
-  { name: "Aarav Mehta", email: "aarav@gradly.in" },
-  { name: "Diya Nair", email: "diya@gradly.in" },
-  { name: "Rohan Verma", email: "rohan@gradly.in" },
-  { name: "Ishita Kapoor", email: "ishita@gradly.in" },
-  { name: "Kabir Shah", email: "kabir@gradly.in" },
+  { name: "Aarav Mehta", email: "aarav@collagehunt.in" },
+  { name: "Diya Nair", email: "diya@collagehunt.in" },
+  { name: "Rohan Verma", email: "rohan@collagehunt.in" },
+  { name: "Ishita Kapoor", email: "ishita@collagehunt.in" },
+  { name: "Kabir Shah", email: "kabir@collagehunt.in" },
 ];
 
 export const colleges: CollegeSeed[] = [

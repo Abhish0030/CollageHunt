@@ -19,7 +19,7 @@ export const useCompareStore = create<CompareStore>()(
       clear: () => set({ ids: [] }),
     }),
     {
-      name: "gradly-compare",
+      name: "collagehunt-compare",
       storage: createJSONStorage(() => localStorage),
     },
   ),

@@ -5,9 +5,13 @@ import { prisma } from "./prisma";
 import { getCookieOptions, getTokenCookieName, signToken } from "../utils/auth";
 
 const DEFAULT_FRONTEND_ORIGIN = "http://localhost:3000";
+const DEFAULT_BACKEND_BASE_URL = "http://localhost:4000";
+const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 const getConfiguredFrontendOrigin = () =>
-  process.env.FRONTEND_ORIGIN ?? process.env.CORS_ORIGIN ?? DEFAULT_FRONTEND_ORIGIN;
-const getBackendBaseUrl = () => process.env.BASE_URL ?? "http://localhost:4000";
+  trimTrailingSlash(process.env.FRONTEND_ORIGIN ?? process.env.CORS_ORIGIN ?? DEFAULT_FRONTEND_ORIGIN);
+const getBackendBaseUrl = () => trimTrailingSlash(process.env.BASE_URL ?? DEFAULT_BACKEND_BASE_URL);
+const getPublicAuthBaseUrl = () =>
+  trimTrailingSlash(process.env.AUTH0_PUBLIC_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? getConfiguredFrontendOrigin());
 const callbackPath = "/api/auth/auth0/callback";
 const getGoogleConnectionName = () => process.env.AUTH0_GOOGLE_CONNECTION ?? "google-oauth2";
 const getGooglePrompt = () => process.env.AUTH0_GOOGLE_PROMPT ?? "select_account";
@@ -108,7 +112,7 @@ const isConfigured = () =>
       !hasPlaceholderValue(process.env.CLIENT_ID) &&
       !hasPlaceholderValue(process.env.CLIENT_SECRET) &&
       !hasPlaceholderValue(process.env.SECRET) &&
-      !hasPlaceholderValue(process.env.BASE_URL),
+      !hasPlaceholderValue(getPublicAuthBaseUrl()),
   );
 
 const sanitizeReturnTo = (value: unknown) => {
@@ -161,19 +165,19 @@ const getProfileClaims = (session: unknown) => {
 };
 
 export const auth0Enabled = () => isConfigured();
-export const getAuth0CallbackUrl = () => `${getBackendBaseUrl()}${callbackPath}`;
+export const getAuth0CallbackUrl = () => `${getPublicAuthBaseUrl()}${callbackPath}`;
 export const getAuth0LogoutUrl = () => getFrontendOrigin();
 export const getAuth0WebOrigin = () => getFrontendOrigin();
 
 export const clearAuthCookies = (res: Response) => {
   res.clearCookie(getTokenCookieName(), getCookieOptions());
-  res.clearCookie("gradly_auth0_session", {
+  res.clearCookie("collagehunt_auth0_session", {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
     secure: isProduction(),
   });
-  res.clearCookie("gradly_auth_verification", {
+  res.clearCookie("collagehunt_auth_verification", {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
@@ -192,13 +196,13 @@ export const createAuth0Middleware = () => {
     auth0Logout: true,
     errorOnRequiredAuth: true,
     secret: process.env.SECRET,
-    baseURL: getBackendBaseUrl(),
+    baseURL: getPublicAuthBaseUrl(),
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     issuerBaseURL: getIssuerBaseUrl(),
     httpTimeout: getAuth0HttpTimeout(),
     session: {
-      name: "gradly_auth0_session",
+      name: "collagehunt_auth0_session",
       cookie: {
         path: "/",
         httpOnly: true,
@@ -207,8 +211,9 @@ export const createAuth0Middleware = () => {
       },
     },
     transactionCookie: {
-      name: "gradly_auth_verification",
+      name: "collagehunt_auth_verification",
       sameSite: "Lax",
+      secure: isProduction,
     },
     routes: {
       login: false,

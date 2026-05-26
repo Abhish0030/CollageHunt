@@ -20,6 +20,7 @@ export interface Review {
   userId: number;
   rating: number;
   body: string;
+  status?: "pending" | "approved" | "rejected";
   createdAt: string;
   user: {
     id: number;
@@ -43,6 +44,10 @@ export interface College {
   highestPackage: number;
   topRecruiters: string[];
   createdAt: string;
+  stream?: string;
+  ownership?: string;
+  nirfRank?: number;
+  accreditation?: string;
   courses: Course[];
   reviews?: Review[];
   _count?: {

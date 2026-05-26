@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AppError } from "./api";
 
-const TOKEN_COOKIE = "gradly_token";
+const TOKEN_COOKIE = "collagehunt_token";
 
 export interface UserJwtPayload {
   userId: number;

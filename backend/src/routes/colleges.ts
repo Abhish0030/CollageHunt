@@ -13,7 +13,7 @@ import { AppError, sendSuccess } from "../utils/api";
 
 const router = Router();
 
-const rankingAgencies = ["gradly", "nirf", "outlook", "iirf", "the-week"] as const;
+const rankingAgencies = ["collagehunt", "nirf", "outlook", "iirf", "the-week"] as const;
 type RankingAgency = (typeof rankingAgencies)[number];
 type SortBy = "rating" | "fees" | "nirfRank";
 
@@ -44,7 +44,7 @@ const compareSchema = z.object({
 
 const rankingsSchema = z.object({
   year: z.coerce.number().int().min(2024).max(2030).default(2026),
-  agency: z.enum(rankingAgencies).default("gradly"),
+  agency: z.enum(rankingAgencies).default("collagehunt"),
   limit: z.coerce.number().int().min(1).max(20).default(10),
 });
 
@@ -105,7 +105,7 @@ const getOrderBy = (sortBy: SortBy): Prisma.CollegeOrderByWithRelationInput[] =>
 
 const buildRankingMeta = (college: { rating: number; placementPct: number; feesPerYear: number }, index: number, agency: RankingAgency) => {
   const agencyOffsetMap: Record<RankingAgency, number> = {
-    gradly: 0,
+    collagehunt: 0,
     nirf: 1,
     outlook: 3,
     iirf: 5,
@@ -113,7 +113,7 @@ const buildRankingMeta = (college: { rating: number; placementPct: number; feesP
   };
 
   const agencyLabelMap: Record<RankingAgency, string> = {
-    gradly: "Gradly",
+    collagehunt: "CollageHunt",
     nirf: "NIRF",
     outlook: "Outlook",
     iirf: "IIRF",

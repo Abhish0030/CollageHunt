@@ -4,22 +4,23 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Landmark, MapPin, Search, Sparkles, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { CollegeCard } from "@/components/CollegeCard";
 import { FilterSidebar } from "@/components/FilterSidebar";
 import { SkeletonCard } from "@/components/SkeletonCard";
+import { filterColleges } from "@/lib/collegeData";
 import { fetchColleges } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
 const DEFAULT_MAX_FEES = 2500000;
 const quickLinks = [
-  { label: "Engineering", href: "/colleges?course=B.Tech" },
-  { label: "Medicine", href: "/colleges?course=MBBS" },
-  { label: "Law", href: "/colleges?course=BA%20LLB" },
-  { label: "Management", href: "/colleges?course=MBA" },
-  { label: "Computer Applications", href: "/colleges?course=BCA" },
+  { label: "Engineering", href: "/colleges?stream=Engineering" },
+  { label: "Medicine", href: "/colleges?stream=Medical" },
+  { label: "Law", href: "/colleges?stream=Law" },
+  { label: "Management", href: "/colleges?stream=Management" },
+  { label: "Computer Applications", href: "/colleges?stream=Computer%20Applications" },
 ] as const;
 
 export const ListingPageClient = () => {
@@ -29,8 +30,9 @@ export const ListingPageClient = () => {
 
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get("search") ?? "");
-  const [location, setLocation] = useState(searchParams.get("location") ?? "");
-  const [course, setCourse] = useState(searchParams.get("course") ?? "");
+  const [location, setLocation] = useState(searchParams.get("city") ?? searchParams.get("location") ?? "");
+  const [stream, setStream] = useState(searchParams.get("stream") ?? "");
+  const [ownership, setOwnership] = useState(searchParams.get("ownership") ?? "");
   const [maxFees, setMaxFees] = useState(Number(searchParams.get("maxFees") ?? DEFAULT_MAX_FEES));
   const [page, setPage] = useState(Number(searchParams.get("page") ?? 1));
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -43,12 +45,13 @@ export const ListingPageClient = () => {
   useEffect(() => {
     const params = new URLSearchParams();
     if (debouncedSearch) params.set("search", debouncedSearch);
-    if (location) params.set("location", location);
-    if (course) params.set("course", course);
+    if (location) params.set("city", location);
+    if (stream) params.set("stream", stream);
+    if (ownership) params.set("ownership", ownership);
     if (maxFees !== DEFAULT_MAX_FEES) params.set("maxFees", String(maxFees));
     if (page > 1) params.set("page", String(page));
     router.replace(`/colleges${params.toString() ? `?${params.toString()}` : ""}`);
-  }, [course, debouncedSearch, location, maxFees, page, router]);
+  }, [debouncedSearch, location, maxFees, ownership, page, router, stream]);
 
   useEffect(() => {
     const authMode = searchParams.get("auth");
@@ -73,60 +76,63 @@ export const ListingPageClient = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, location, course, maxFees]);
+  }, [debouncedSearch, location, maxFees, ownership, stream]);
 
-  const listingQuery = useQuery({
-    queryKey: ["colleges", debouncedSearch, location, course, maxFees, page],
-    queryFn: () =>
-      fetchColleges({
+  const directoryQuery = useQuery({
+    queryKey: ["college-directory-local"],
+    queryFn: () => fetchColleges({ limit: 200, page: 1 }),
+  });
+
+  const directory = directoryQuery.data?.data ?? [];
+  const filteredResult = useMemo(
+    () =>
+      filterColleges({
         search: debouncedSearch || undefined,
-        location: location || undefined,
-        course: course || undefined,
+        city: location || undefined,
+        stream: stream || undefined,
+        ownership: ownership || undefined,
         maxFees,
         page,
         limit: 12,
       }),
-  });
-
-  const directoryQuery = useQuery({
-    queryKey: ["college-directory"],
-    queryFn: () => fetchColleges({ limit: 40, page: 1 }),
-  });
-
-  const colleges = listingQuery.data?.data ?? [];
-  const meta = listingQuery.data?.meta;
-  const directory = directoryQuery.data?.data ?? [];
+    [debouncedSearch, location, maxFees, ownership, page, stream],
+  );
+  const colleges = filteredResult.colleges;
+  const meta = {
+    total: filteredResult.total,
+    page: filteredResult.page,
+    limit: filteredResult.limit,
+  };
   const locations = [...new Set(directory.map((college) => college.city))].sort();
-  const courseOptions = [...new Set(directory.flatMap((college) => college.courses.map((item) => item.name)))].sort();
-  const activeFilterCount = [debouncedSearch, location, course, maxFees !== DEFAULT_MAX_FEES].filter(Boolean).length;
+  const streams = [...new Set(directory.map((college) => college.stream).filter(Boolean))].sort() as string[];
+  const ownershipOptions = [...new Set(directory.map((college) => college.ownership).filter(Boolean))].sort() as string[];
+  const activeFilterCount = [debouncedSearch, location, stream, ownership, maxFees !== DEFAULT_MAX_FEES].filter(Boolean).length;
   const affordableCount = directory.filter((college) => college.feesPerYear <= 300000).length;
   const highRatedCount = directory.filter((college) => college.rating >= 4.5).length;
-  const lawCount = directory.filter((college) =>
-    college.courses.some((courseItem) => ["BA LLB", "BBA LLB", "LLB", "LLM"].includes(courseItem.name)),
-  ).length;
+  const lawCount = directory.filter((college) => college.stream === "Law").length;
 
   const handleResetFilters = () => {
     setSearch("");
     setDebouncedSearch("");
     setLocation("");
-    setCourse("");
+    setStream("");
+    setOwnership("");
     setMaxFees(DEFAULT_MAX_FEES);
     setPage(1);
   };
 
   return (
     <div className="container-shell py-10">
-      <section className="relative mb-8 overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-10 text-white shadow-card sm:px-8 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(96,165,250,0.22),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.18),_transparent_30%)]" />
-        <div className="relative">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">College Discovery</p>
+      <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white px-6 py-10 sm:px-8 lg:px-10">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-700">College Discovery</p>
           <div className="mt-5 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
             <div>
-              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-                Search colleges by outcomes, affordability, and fit.
+              <h1 className="max-w-3xl text-[34px] font-bold tracking-tight text-slate-950 sm:text-[36px]">
+                Find colleges by stream, city, fees, and ownership.
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                Discover realistic options across India with live filters for city, course, annual fees, and career direction.
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+                Explore a seeded directory of Indian colleges with instant client-side filtering and shortlist-friendly cards.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -134,7 +140,7 @@ export const ListingPageClient = () => {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/10"
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300"
                   >
                     {link.label}
                   </Link>
@@ -142,67 +148,67 @@ export const ListingPageClient = () => {
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/6 p-5 backdrop-blur">
-              <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-4 text-slate-900 shadow-lg">
+            <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-slate-900">
                 <Search size={18} className="text-slate-400" />
                 <input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search by college, city, state, or course"
+                  placeholder="Search by college, city, state, or stream"
                   className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
                 />
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Landmark size={16} className="text-blue-300" />
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <Landmark size={16} className="text-blue-700" />
                     <span className="text-xs uppercase tracking-[0.18em]">Directory</span>
                   </div>
-                  <p className="mt-3 text-2xl font-semibold">{directory.length}</p>
-                  <p className="mt-1 text-xs text-slate-400">colleges indexed</p>
+                  <p className="mt-3 text-2xl font-semibold text-slate-950">{directory.length}</p>
+                  <p className="mt-1 text-xs text-slate-500">colleges indexed</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Wallet size={16} className="text-emerald-300" />
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <Wallet size={16} className="text-blue-700" />
                     <span className="text-xs uppercase tracking-[0.18em]">Affordable</span>
                   </div>
-                  <p className="mt-3 text-2xl font-semibold">{affordableCount}</p>
-                  <p className="mt-1 text-xs text-slate-400">under Rs 3L/year</p>
+                  <p className="mt-3 text-2xl font-semibold text-slate-950">{affordableCount}</p>
+                  <p className="mt-1 text-xs text-slate-500">under Rs 3L/year</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Sparkles size={16} className="text-amber-300" />
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <Sparkles size={16} className="text-blue-700" />
                     <span className="text-xs uppercase tracking-[0.18em]">Strong Picks</span>
                   </div>
-                  <p className="mt-3 text-2xl font-semibold">{highRatedCount}</p>
-                  <p className="mt-1 text-xs text-slate-400">rated 4.5 and above</p>
+                  <p className="mt-3 text-2xl font-semibold text-slate-950">{highRatedCount}</p>
+                  <p className="mt-1 text-xs text-slate-500">rated 4.5 and above</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_300px]">
-            <div className="rounded-2xl border border-white/10 bg-white/6 px-5 py-4 text-sm text-slate-200">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-700">
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                 <span className="inline-flex items-center gap-2">
-                  <MapPin size={15} className="text-blue-300" />
+                  <MapPin size={15} className="text-blue-700" />
                   {locations.length} cities tracked
                 </span>
                 <span className="inline-flex items-center gap-2">
-                  <Landmark size={15} className="text-violet-300" />
+                  <Landmark size={15} className="text-blue-700" />
                   {lawCount} law-focused options available
                 </span>
                 <span className="inline-flex items-center gap-2">
-                  <Sparkles size={15} className="text-amber-300" />
-                  {courseOptions.length} course types you can filter instantly
+                  <Sparkles size={15} className="text-blue-700" />
+                  {streams.length} streams you can filter instantly
                 </span>
               </div>
             </div>
-            <div className="rounded-2xl border border-blue-400/20 bg-blue-400/10 px-5 py-4 text-sm text-blue-100">
-              <p className="font-semibold text-white">Best move for law discovery</p>
-              <p className="mt-1 text-blue-100/90">
-                Try `BA LLB`, `LLB`, or a city like `Delhi` to narrow the shortlist faster.
+            <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700">
+              <p className="font-semibold text-slate-950">Best move for faster filtering</p>
+              <p className="mt-1 text-slate-600">
+                Combine a stream, city, and max fee to surface a smaller shortlist immediately.
               </p>
             </div>
           </div>
@@ -211,12 +217,15 @@ export const ListingPageClient = () => {
 
       <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
         <FilterSidebar
+          streams={streams}
           locations={locations}
-          courseOptions={courseOptions}
+          ownershipOptions={ownershipOptions}
+          stream={stream}
+          setStream={setStream}
           location={location}
           setLocation={setLocation}
-          course={course}
-          setCourse={setCourse}
+          ownership={ownership}
+          setOwnership={setOwnership}
           maxFees={maxFees}
           setMaxFees={setMaxFees}
           onReset={handleResetFilters}
@@ -247,9 +256,14 @@ export const ListingPageClient = () => {
                   City: {location}
                 </span>
               ) : null}
-              {course ? (
+              {stream ? (
                 <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
-                  Course: {course}
+                  Stream: {stream}
+                </span>
+              ) : null}
+              {ownership ? (
+                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                  Ownership: {ownership}
                 </span>
               ) : null}
               {maxFees !== DEFAULT_MAX_FEES ? (
@@ -265,14 +279,13 @@ export const ListingPageClient = () => {
             </div>
           </div>
 
-          {course === "BA LLB" || course === "LLB" || debouncedSearch.toLowerCase().includes("law") ? (
+          {stream === "Law" || debouncedSearch.toLowerCase().includes("law") ? (
             <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-amber-900">Law shortlist mode</p>
                   <p className="mt-1 text-sm text-amber-800">
-                    Focus on `BA LLB`, `BBA LLB`, `LLB`, and `LLM` options. Top legal hubs in this directory include Delhi,
-                    Bengaluru, Hyderabad, Pune, and Kolkata.
+                    Legal programs are strongest in Delhi, Bengaluru, Hyderabad, Pune, Kolkata, and Sonipat within this seeded directory.
                   </p>
                 </div>
                 <Link href="/recommendations" className="inline-flex items-center gap-2 text-sm font-semibold text-amber-900">
@@ -296,7 +309,7 @@ export const ListingPageClient = () => {
             ) : null}
           </div>
 
-          {listingQuery.isLoading ? (
+          {directoryQuery.isLoading ? (
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <SkeletonCard key={index} />

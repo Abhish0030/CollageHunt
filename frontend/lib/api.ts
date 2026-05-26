@@ -1,6 +1,12 @@
 "use client";
 
 import axios, { AxiosError } from "axios";
+import {
+  filterColleges,
+  getCollegeByIdentifier,
+  getComparedColleges,
+  getFeaturedColleges,
+} from "@/lib/collegeData";
 import { getApiBaseUrl, getApiFallbackUrl } from "@/lib/env";
 import type {
   ApiErrorResponse,
@@ -46,7 +52,11 @@ export type HelpQuestionFilters = {
 };
 
 export const getApiErrorMessage = (error: unknown) => {
-  const axiosError = error as AxiosError<ApiErrorResponse>;
+  if (!axios.isAxiosError<ApiErrorResponse>(error)) {
+    return error instanceof Error ? error.message : "Something went wrong";
+  }
+
+  const axiosError: AxiosError<ApiErrorResponse> = error;
   if (axiosError.code === "ERR_NETWORK") {
     return `Unable to reach the server. Please make sure the backend is running at ${baseURL ?? fallbackApiUrl}.`;
   }
@@ -54,51 +64,74 @@ export const getApiErrorMessage = (error: unknown) => {
 };
 
 export const isUnauthorizedError = (error: unknown) => {
-  const axiosError = error as AxiosError<ApiErrorResponse>;
+  if (!axios.isAxiosError<ApiErrorResponse>(error)) {
+    return false;
+  }
+
+  const axiosError: AxiosError<ApiErrorResponse> = error;
   return axiosError.response?.status === 401 || axiosError.response?.data?.error?.code === "UNAUTHORIZED";
 };
 
 export const fetchColleges = async (filters: CollegeFilters) => {
-  const response = await api.get<ApiResponse<College[]>>("/api/colleges", { params: filters });
-  return response.data;
+  const result = filterColleges(filters);
+  return {
+    success: true,
+    data: result.colleges,
+    meta: {
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+    },
+  } satisfies ApiResponse<College[]>;
 };
 
 export const fetchCollege = async (identifier: string) => {
-  const response = await api.get<ApiResponse<College>>(`/api/colleges/${identifier}`);
-  return response.data.data;
+  const college = getCollegeByIdentifier(identifier);
+  if (!college) {
+    throw new Error("College not found");
+  }
+  return college;
 };
 
 export const fetchComparedColleges = async (ids: number[]) => {
-  const response = await api.get<ApiResponse<College[]>>("/api/colleges/compare", {
-    params: { ids: ids.join(",") },
-  });
-  return response.data.data;
+  return getComparedColleges(ids);
 };
 
 export const fetchFeaturedColleges = async (limit = 6) => {
-  const response = await api.get<ApiResponse<College[]>>("/api/colleges/featured", {
-    params: { limit },
-  });
-  return response.data.data;
+  return getFeaturedColleges(limit);
 };
 
 export const fetchTopColleges = async (category: string, limit = 10) => {
-  const response = await api.get<ApiResponse<College[]>>("/api/colleges", {
-    params: {
-      limit,
-      page: 1,
-      sortBy: "rating",
-      category,
-    },
-  });
-  return response.data.data;
+  return filterColleges({
+    stream: category,
+    sortBy: "rating",
+    limit,
+    page: 1,
+  }).colleges;
 };
 
 export const fetchCollegeRankings = async (year: number, agency: string, limit = 10) => {
-  const response = await api.get<ApiResponse<RankedCollege[]>>("/api/colleges/rankings", {
-    params: { year, agency, limit },
-  });
-  return response.data.data;
+  return filterColleges({
+    sortBy: "nirfRank",
+    limit,
+    page: 1,
+  }).colleges.map((college) => ({
+    ...college,
+    ranking: {
+      agency,
+      rank: college.nirfRank,
+      total: 200,
+      score: Math.max(65, Math.round(college.rating * 18 + college.placementPct * 0.15 - college.feesPerYear / 200000)),
+    },
+    stream: college.stream,
+    abbreviation: college.name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 5)
+      .toUpperCase(),
+    year,
+  }));
 };
 
 export const fetchCourses = async (level: string, limit = 8) => {

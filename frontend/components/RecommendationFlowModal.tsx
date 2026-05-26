@@ -74,7 +74,7 @@ export const RecommendationFlowModal = () => {
   const finishFlow = () => {
     setRecommendationPreferences(preferences);
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("gradly-recommendation-preferences", JSON.stringify(preferences));
+      window.localStorage.setItem("collagehunt-recommendation-preferences", JSON.stringify(preferences));
     }
     closeRecommendationFlow();
     router.push(`/recommendations?${buildQuery(preferences)}`);
@@ -84,7 +84,7 @@ export const RecommendationFlowModal = () => {
     <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-950/55 px-4 py-8 backdrop-blur-sm">
       <div className="mx-auto w-full max-w-3xl rounded-[32px] border border-white/80 bg-white px-6 py-8 shadow-2xl sm:px-8">
         <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">Welcome to Gradly</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">Welcome to CollageHunt</p>
           <h2 className="mt-3 text-3xl font-semibold text-slate-950">
             {step === 1 ? "Pick your interests and target exams" : "Tune your recommendation preferences"}
           </h2>

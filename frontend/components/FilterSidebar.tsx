@@ -3,12 +3,15 @@
 import { Filter, RotateCcw, SlidersHorizontal } from "lucide-react";
 
 type Props = {
+  streams: string[];
   locations: string[];
-  courseOptions: string[];
+  ownershipOptions: string[];
+  stream: string;
+  setStream: (value: string) => void;
   location: string;
   setLocation: (value: string) => void;
-  course: string;
-  setCourse: (value: string) => void;
+  ownership: string;
+  setOwnership: (value: string) => void;
   maxFees: number;
   setMaxFees: (value: number) => void;
   onReset: () => void;
@@ -17,12 +20,15 @@ type Props = {
 };
 
 export const FilterSidebar = ({
+  streams,
   locations,
-  courseOptions,
+  ownershipOptions,
+  stream,
+  setStream,
   location,
   setLocation,
-  course,
-  setCourse,
+  ownership,
+  setOwnership,
   maxFees,
   setMaxFees,
   onReset,
@@ -74,10 +80,22 @@ export const FilterSidebar = ({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Course type</label>
-              <select className="field-base" value={course} onChange={(event) => setCourse(event.target.value)}>
-                <option value="">All courses</option>
-                {courseOptions.map((item) => (
+              <label className="mb-2 block text-sm font-medium text-slate-700">Stream</label>
+              <select className="field-base" value={stream} onChange={(event) => setStream(event.target.value)}>
+                <option value="">All streams</option>
+                {streams.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">Ownership</label>
+              <select className="field-base" value={ownership} onChange={(event) => setOwnership(event.target.value)}>
+                <option value="">All ownership types</option>
+                {ownershipOptions.map((item) => (
                   <option key={item} value={item}>
                     {item}
                   </option>

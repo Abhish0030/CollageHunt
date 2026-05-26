@@ -46,7 +46,7 @@ if (auth0Middleware) {
 app.get("/", (_req, res) => {
   res.status(200).json({
     status: "ok",
-    service: "gradly-backend",
+    service: "collagehunt-backend",
     routes: ["/health", "/api", "/api/colleges", "/api/auth"],
   });
 });
@@ -58,7 +58,7 @@ app.get("/health", (_req, res) => {
 app.get("/api", (_req, res) => {
   res.status(200).json({
     status: "ok",
-    message: "Gradly backend API is running",
+    message: "CollageHunt backend API is running",
     auth0CallbackUrl: auth0Enabled() ? getAuth0CallbackUrl() : null,
   });
 });

@@ -1,0 +1,61 @@
+<svg width="600" height="150" viewBox="0 0 600 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>CollageHunt</title>
+  <desc>CollageHunt logo with graduation cap, magnifying glass, and tagline.</desc>
+  <g transform="translate(18 18)">
+    <path
+      d="M84 0L0 30L23 39V58L28 54V41L84 21L140 41V54L145 58V39L168 30L84 0Z"
+      fill="#153A84"
+    />
+    <path
+      d="M150 42L143 78H157L150 42Z"
+      fill="#153A84"
+    />
+    <circle cx="84" cy="72" r="44" stroke="#FF7A14" stroke-width="12" />
+    <circle cx="84" cy="72" r="23" stroke="#153A84" stroke-width="8" />
+    <path
+      d="M35 110L10 128C4 134 4 143 10 149C16 155 26 155 31 149L56 123"
+      stroke="#FF7A14"
+      stroke-width="14"
+      stroke-linecap="round"
+    />
+    <path
+      d="M56 63C61 54 72 49 84 49C98 49 110 56 115 67C108 60 97 56 84 56C73 56 63 59 56 63Z"
+      fill="#153A84"
+    />
+    <circle cx="96" cy="58" r="4.5" fill="#153A84" />
+  </g>
+
+  <text
+    x="215"
+    y="79"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="64"
+    font-weight="700"
+    letter-spacing="-1.4"
+    fill="#153A84"
+  >
+    College
+  </text>
+  <text
+    x="425"
+    y="79"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="64"
+    font-weight="700"
+    letter-spacing="-1.4"
+    fill="#FF7A14"
+  >
+    Hunt
+  </text>
+  <text
+    x="256"
+    y="122"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="26"
+    font-weight="500"
+    letter-spacing="0.2"
+    fill="#5F6368"
+  >
+    Discover • Compare • Decide
+  </text>
+</svg>

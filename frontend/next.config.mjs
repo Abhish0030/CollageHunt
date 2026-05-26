@@ -2,6 +2,7 @@
 const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
+    externalDir: true,
   },
   images: {
     remotePatterns: [
@@ -18,15 +19,6 @@ const nextConfig = {
         hostname: "img.jagranjosh.com",
       },
     ],
-  },
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.cache = {
-        type: "memory",
-      };
-    }
-
-    return config;
   },
 };
 

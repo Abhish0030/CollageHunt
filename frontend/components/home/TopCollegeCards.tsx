@@ -52,9 +52,9 @@ export const TopCollegeCards = () => {
                   {getTopCourse(college.courses)}  ⭐ {college.rating.toFixed(1)}/5  ({college._count?.reviews ?? 0} reviews)
                 </p>
                 <p className="font-semibold text-orange-500">{formatCurrency(college.feesPerYear)} Total Fees</p>
-                <p className="text-xs text-gray-500">Ranked {index + 1} out of 372 Gradly-ranked colleges in India</p>
+                <p className="text-xs text-gray-500">Ranked {index + 1} out of 372 CollageHunt-ranked colleges in India</p>
                 <div className="h-px bg-slate-200" />
-                <Link href={`/college/${college.slug}`} className="block text-sm text-slate-700">View All Courses and fees ›</Link>
+                <Link href={`/colleges/${college.slug}`} className="block text-sm text-slate-700">View All Courses and fees ›</Link>
                 <a href={college.website ?? "/"} className="block text-sm text-orange-500">Download Brochure ›</a>
                 <Link href="/compare" className="block text-sm text-slate-700">Compare ›</Link>
               </div>

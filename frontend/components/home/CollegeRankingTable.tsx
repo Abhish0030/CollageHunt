@@ -8,7 +8,7 @@ import { getInitials } from "@/lib/utils";
 
 const yearOptions = [2026, 2025, 2024] as const;
 const agencies = [
-  { label: "Gradly", value: "gradly" },
+  { label: "CollageHunt", value: "collagehunt" },
   { label: "NIRF", value: "nirf" },
   { label: "Outlook", value: "outlook" },
   { label: "IIRF", value: "iirf" },
@@ -17,7 +17,7 @@ const agencies = [
 
 export const CollegeRankingTable = () => {
   const [year, setYear] = useState<(typeof yearOptions)[number]>(2026);
-  const [agency, setAgency] = useState<(typeof agencies)[number]["value"]>("gradly");
+  const [agency, setAgency] = useState<(typeof agencies)[number]["value"]>("collagehunt");
 
   const rankingsQuery = useQuery({
     queryKey: ["college-rankings", year, agency],
@@ -91,7 +91,7 @@ export const CollegeRankingTable = () => {
                             {getInitials(college.name)}
                           </div>
                           <div>
-                            <Link href={`/college/${college.slug}`} className="font-semibold text-slate-900 hover:text-blue-700">
+                            <Link href={`/colleges/${college.slug}`} className="font-semibold text-slate-900 hover:text-blue-700">
                               {college.name} - {college.abbreviation}
                             </Link>
                             <p className="text-xs text-slate-500">{college.city}</p>

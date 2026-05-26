@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import CollegeDuniaHome from "@/components/home/CollegeDuniaHome";
-import GradlyDashboard from "@/components/home/GradlyDashboard";
+import CollageHuntDashboard from "@/components/home/CollageHuntDashboard";
 import HomePageSkeleton from "@/components/home/HomePageSkeleton";
 import { fetchMe, isUnauthorizedError } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
@@ -58,7 +58,7 @@ export default function HomePage() {
   }
 
   if (user) {
-    return <GradlyDashboard />;
+    return <CollageHuntDashboard />;
   }
 
   return <CollegeDuniaHome />;

@@ -87,7 +87,7 @@ export const TopCollegesTable = () => {
                               {getInitials(college.name)}
                             </div>
                             <div>
-                              <Link href={`/college/${college.slug}`} className="font-semibold text-slate-900 hover:text-blue-700">
+                              <Link href={`/colleges/${college.slug}`} className="font-semibold text-slate-900 hover:text-blue-700">
                                 {college.name}
                               </Link>
                               <p className="mt-1 text-xs text-slate-500">

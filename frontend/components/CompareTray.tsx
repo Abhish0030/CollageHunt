@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { fetchCollege } from "@/lib/api";
@@ -18,18 +17,12 @@ export const CompareTray = () => {
   const labels = data?.map((college) => ({ id: college.id, name: college.name })) ?? [];
 
   return (
-    <AnimatePresence>
-      {ids.length > 0 ? (
-        <motion.div
-          initial={{ y: 120, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 120, opacity: 0 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 shadow-2xl backdrop-blur"
-        >
+    <>
+      {ids.length >= 2 ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white">
           <div className="container-shell flex flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">Compare Tray</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">Shortlisted For Compare</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {(labels.length > 0 ? labels : ids.map((id) => ({ id, name: "Loading..." }))).map((item) => (
                   <span
@@ -49,12 +42,12 @@ export const CompareTray = () => {
                 Clear
               </button>
               <Link href={`/compare?ids=${ids.join(",")}`} className="button-primary">
-                Compare Now
+                Compare shortlisted colleges
               </Link>
             </div>
           </div>
-        </motion.div>
+        </div>
       ) : null}
-    </AnimatePresence>
+    </>
   );
 };

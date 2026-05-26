@@ -11,7 +11,7 @@ const footerColumns = [
   { title: "Board Exams", items: ["CBSE Class 12", "CBSE Class 12th Results", "CBSE Class 12th Syllabus", "CBSE Class 12th Exam Dates", "CBSE Class 10", "CBSE Class 10th Result", "CBSE Class 10th Syllabus"] },
 ] as const;
 
-const otherLinks = ["About Gradly", "Contact Us", "Terms & Conditions", "Privacy Policy"] as const;
+const otherLinks = ["About CollageHunt", "Contact Us", "Terms & Conditions", "Privacy Policy"] as const;
 const socials = [
   { icon: Facebook, label: "Facebook" },
   { icon: Instagram, label: "Instagram" },
@@ -67,12 +67,13 @@ export const MegaFooter = () => {
         <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
             <div className="text-2xl font-black tracking-tight">
-              Grad<span className="text-blue-400">ly</span>
+              <span className="text-[#153A84]">Collage</span>
+              <span className="text-[#F97316]">Hunt</span>
             </div>
-            <p className="text-sm text-slate-400">© 2026 Gradly. All Rights Reserved.</p>
+            <p className="text-sm text-slate-400">© 2026 CollageHunt. All Rights Reserved.</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm text-slate-400">Download the Gradly app on</span>
+            <span className="text-sm text-slate-400">Download the CollageHunt app on</span>
             <a href="/" className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200">
               <Play className="h-4 w-4" />
               Google Play

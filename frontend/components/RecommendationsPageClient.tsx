@@ -59,37 +59,48 @@ export const RecommendationsPageClient = ({ colleges }: { colleges: College[] })
 
   return (
     <div className="container-shell py-10">
-      <section className="rounded-[2rem] bg-slate-950 px-6 py-12 text-white shadow-card">
-        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-300">Personalized Recommendations</p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Colleges and online degree options tailored to your interests.
-        </h1>
-        <p className="mt-4 max-w-3xl text-base leading-8 text-slate-300">
-          We used your selected interests, exam plans, budget, preferred location, and study format to build this shortlist.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          {preferences.interests.map((interest) => (
-            <span key={interest} className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white">
-              {interest}
+      <section className="relative overflow-hidden rounded-[2rem] border border-slate-800/60 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_28%),radial-gradient(circle_at_85%_22%,rgba(249,115,22,0.18),transparent_20%),linear-gradient(135deg,#050816_0%,#0b1330_46%,#111827_100%)] px-6 py-12 text-white shadow-[0_24px_70px_rgba(15,23,42,0.18)]">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0)_38%)]" />
+        <div className="absolute -right-20 top-10 h-48 w-48 rounded-full bg-blue-400/10 blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-40 w-40 rounded-full bg-orange-400/10 blur-3xl" />
+        <div className="relative">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-300">Personalized Recommendations</p>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+            Colleges and online degree options tailored to your interests.
+          </h1>
+          <p className="mt-4 max-w-3xl text-base leading-8 text-slate-300">
+            We used your selected interests, exam plans, budget, preferred location, and study format to build this shortlist.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {preferences.interests.map((interest) => (
+              <span
+                key={interest}
+                className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
+              >
+                {interest}
+              </span>
+            ))}
+            {preferences.preferredStates.map((state) => (
+              <span
+                key={state}
+                className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
+              >
+                State: {state}
+              </span>
+            ))}
+            {preferences.preferredLocation ? (
+              <span className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+                <MapPin className="mr-2 inline" size={14} />
+                {preferences.preferredLocation}
+              </span>
+            ) : null}
+            <span className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+              Budget: {preferences.budget}
             </span>
-          ))}
-          {preferences.preferredStates.map((state) => (
-            <span key={state} className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white">
-              State: {state}
+            <span className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+              Mode: {preferences.studyMode}
             </span>
-          ))}
-          {preferences.preferredLocation ? (
-            <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white">
-              <MapPin className="mr-2 inline" size={14} />
-              {preferences.preferredLocation}
-            </span>
-          ) : null}
-          <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white">
-            Budget: {preferences.budget}
-          </span>
-          <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white">
-            Mode: {preferences.studyMode}
-          </span>
+          </div>
         </div>
       </section>
 

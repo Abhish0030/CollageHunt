@@ -72,7 +72,7 @@ const passwordSuggestions = [
 
 const buildSuggestedPassword = () => {
   const randomChunk = Math.random().toString(36).slice(-4);
-  return `Gradly@${new Date().getFullYear()}${randomChunk.toUpperCase()}`;
+  return `CollageHunt@${new Date().getFullYear()}${randomChunk.toUpperCase()}`;
 };
 
 export const AuthModal = () => {
@@ -414,7 +414,7 @@ export const AuthModal = () => {
                   {...registerForm.register("consent")}
                 />
                 <span>
-                  I agree to Gradly&apos;s <span className="text-[#4d63b5] underline">Privacy Policy</span> and{" "}
+                  I agree to CollageHunt&apos;s <span className="text-[#4d63b5] underline">Privacy Policy</span> and{" "}
                   <span className="text-[#4d63b5] underline">Terms &amp; Conditions</span> and provide consent to be
                   contacted for updates.
                 </span>
@@ -434,7 +434,7 @@ export const AuthModal = () => {
           </div>
 
           <p className="text-center text-[1.05rem] text-slate-800">
-            {isLogin ? "Don't have a Gradly account?" : "Already have a Gradly account?"}{" "}
+            {isLogin ? "Don't have a CollageHunt account?" : "Already have a CollageHunt account?"}{" "}
             <button
               type="button"
               onClick={() => setAuthMode(isLogin ? "register" : "login")}
@@ -448,7 +448,7 @@ export const AuthModal = () => {
           <p className="text-center text-sm text-slate-500">
             {isLogin
               ? "Use your email or 10-digit mobile number with the same password."
-              : "Google sign-up creates your Gradly account automatically on first login."}
+              : "Google sign-up creates your CollageHunt account automatically on first login."}
           </p>
 
         </form>

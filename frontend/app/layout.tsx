@@ -7,8 +7,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Gradly | Discover Top Colleges in India",
-    template: "%s | Gradly",
+    default: "CollageHunt | Discover Top Colleges in India",
+    template: "%s | CollageHunt",
   },
   description:
     "Search, compare, and save top Indian colleges across engineering, management, medical, and more.",

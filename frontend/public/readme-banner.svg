@@ -1,0 +1,24 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="banner-radius">
+      <rect width="1280" height="720" rx="20" ry="20" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#banner-radius)">
+    <image href="./gradly-banner.png" width="1280" height="720" preserveAspectRatio="xMidYMid slice" />
+    <rect x="18" y="14" width="280" height="62" rx="16" fill="white" fill-opacity="0.96" />
+    <g transform="translate(40 23)">
+      <path d="M24 2L2 10L8 13V20L10 18V14L24 8L38 14V18L40 20V13L46 10L24 2Z" fill="#153A84" />
+      <path d="M38 14L36 27H42L40 14H38Z" fill="#153A84" />
+      <circle cx="24" cy="25" r="12" stroke="#F97316" stroke-width="5" fill="white" />
+      <circle cx="24" cy="25" r="6.5" stroke="#153A84" stroke-width="3" fill="white" />
+      <path d="M15 34L5 43" stroke="#F97316" stroke-width="5" stroke-linecap="round" />
+    </g>
+    <text x="104" y="48" fill="#153A84" font-size="27" font-weight="800" font-family="Georgia, 'Times New Roman', serif">
+      Collage<tspan fill="#F97316">Hunt</tspan>
+    </text>
+    <text x="104" y="66" fill="#64748B" font-size="12" font-weight="500" font-family="Georgia, 'Times New Roman', serif">
+      Discover · Compare · Decide
+    </text>
+  </g>
+</svg>

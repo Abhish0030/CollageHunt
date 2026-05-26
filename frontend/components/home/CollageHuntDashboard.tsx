@@ -17,7 +17,7 @@ import { HelpDashboardWidget } from "@/components/help/HelpDashboardWidget";
 import { fetchColleges, fetchFeaturedColleges } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 
-export const GradlyDashboard = () => {
+export const CollageHuntDashboard = () => {
   const featuredQuery = useQuery({
     queryKey: ["homepage-featured"],
     queryFn: () => fetchFeaturedColleges(),
@@ -86,7 +86,7 @@ export const GradlyDashboard = () => {
 
   return (
     <div className="pb-16">
-      <section className="border-b border-white/60 bg-white/70 backdrop-blur">
+      <section className="border-b border-slate-200 bg-white">
         <div className="container-shell flex flex-wrap items-center justify-center gap-3 py-4 lg:justify-between">
           {dashboardCategories.map((item) => {
             const Icon = item.icon;
@@ -219,7 +219,7 @@ export const GradlyDashboard = () => {
               Ease your biggest doubts with clearer pathways and smarter shortlists.
             </h2>
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Move beyond generic ranking lists. Gradly helps you match scores, outcomes, and preferences with colleges that actually fit.
+              Move beyond generic ranking lists. CollageHunt helps you match scores, outcomes, and preferences with colleges that actually fit.
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -238,23 +238,23 @@ export const GradlyDashboard = () => {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-300">Affordable Picks</p>
-              <h3 className="mt-3 text-2xl font-semibold">Budget-friendly colleges with strong visibility</h3>
+            <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(160deg,#eff6ff_0%,#ffffff_42%,#fff7ed_100%)] p-6 shadow-sm">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">Affordable Picks</p>
+              <h3 className="mt-3 text-2xl font-semibold text-slate-950">Budget-friendly colleges with strong visibility</h3>
               <div className="mt-6 space-y-4">
                 {affordablePicks.map((college) => (
-                  <div key={college.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="font-semibold">{college.name}</p>
-                    <p className="mt-1 text-sm text-slate-300">
+                  <div key={college.id} className="rounded-2xl border border-slate-200 bg-white/90 p-4 backdrop-blur-sm">
+                    <p className="font-semibold text-slate-900">{college.name}</p>
+                    <p className="mt-1 text-sm text-slate-500">
                       {college.city}, {college.state}
                     </p>
-                    <p className="mt-3 text-sm font-medium text-blue-200">{formatCurrency(college.feesPerYear)}</p>
+                    <p className="mt-3 text-sm font-medium text-blue-700">{formatCurrency(college.feesPerYear)}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-[2rem] bg-[linear-gradient(160deg,#fff7ed_0%,#ffffff_45%,#eef2ff_100%)] p-6 shadow-sm">
+            <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(160deg,#eff6ff_0%,#ffffff_42%,#fff7ed_100%)] p-6 shadow-sm">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">Management Focus</p>
               <h3 className="mt-3 text-2xl font-semibold text-slate-950">Top MBA-friendly campuses to compare next</h3>
               <div className="mt-6 space-y-4">
@@ -299,4 +299,4 @@ export const GradlyDashboard = () => {
   );
 };
 
-export default GradlyDashboard;
+export default CollageHuntDashboard;
