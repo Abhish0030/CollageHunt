@@ -14,8 +14,10 @@ export const getBackendApiBaseUrl = () => {
 };
 
 export const getApiBaseUrl = () => {
+  const backendUrl = getBackendApiBaseUrl();
+
   if (typeof window !== "undefined") {
-    return "";
+    return backendUrl;
   }
 
   const vercelUrl =
@@ -32,3 +34,9 @@ export const getApiBaseUrl = () => {
 };
 
 export const getApiFallbackUrl = () => getBackendApiBaseUrl();
+
+export const getAuthCookieNames = () => [
+  "collagehunt_token",
+  "collagehunt_auth0_session",
+  "collagehunt_auth_verification",
+] as const;
