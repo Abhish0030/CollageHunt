@@ -8,11 +8,7 @@ import { useEffect, useState } from "react";
 import { fetchMe, fetchSavedColleges, getAuth0LogoutUrl, getQuestions, isUnauthorizedError, logoutUser } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
-type NavbarProps = {
-  hasAuthCookie: boolean;
-};
-
-export const Navbar = ({ hasAuthCookie }: NavbarProps) => {
+export const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -26,7 +22,7 @@ export const Navbar = ({ hasAuthCookie }: NavbarProps) => {
     queryFn: fetchMe,
     retry: false,
     staleTime: 120000,
-    enabled: hasAuthCookie,
+    enabled: !user,
   });
 
   const savedQuery = useQuery({

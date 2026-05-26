@@ -7,11 +7,7 @@ import CollageHuntDashboard from "@/components/home/CollageHuntDashboard";
 import { fetchMe, isUnauthorizedError } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
-type HomePageClientProps = {
-  hasAuthCookie: boolean;
-};
-
-export default function HomePageClient({ hasAuthCookie }: HomePageClientProps) {
+export default function HomePageClient() {
   const [hasMounted, setHasMounted] = useState(false);
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
@@ -26,7 +22,7 @@ export default function HomePageClient({ hasAuthCookie }: HomePageClientProps) {
     queryFn: fetchMe,
     retry: false,
     staleTime: 120000,
-    enabled: hasMounted && hasAuthCookie && !user,
+    enabled: hasMounted && !user,
   });
 
   useEffect(() => {
