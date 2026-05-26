@@ -9,12 +9,12 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "prisma generate && tsc -p tsconfig.json && node scripts/copy-prisma-client.js",
-    "start": "prisma migrate deploy && node dist/src/index.js",
-    "start:prod": "prisma migrate deploy && node dist/src/index.js",
+    "start": "node scripts/start.js",
+    "start:prod": "node scripts/start.js",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy",
+    "prisma:deploy": "node scripts/prisma-deploy.js",
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {

@@ -7,15 +7,51 @@ import { getCookieOptions, getTokenCookieName, signToken } from "../utils/auth";
 const DEFAULT_FRONTEND_ORIGIN = "http://localhost:3000";
 const DEFAULT_BACKEND_BASE_URL = "http://localhost:4000";
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
+const getConfiguredValue = (...values: Array<string | undefined | null>) =>
+  values.find((value) => typeof value === "string" && value.trim().length > 0)?.trim();
+const normalizeUrl = (value: string) =>
+  trimTrailingSlash(/^https?:\/\//i.test(value) ? value : `https://${value}`);
 const getConfiguredFrontendOrigin = () =>
-  trimTrailingSlash(process.env.FRONTEND_ORIGIN ?? process.env.CORS_ORIGIN ?? DEFAULT_FRONTEND_ORIGIN);
-const getBackendBaseUrl = () => trimTrailingSlash(process.env.BASE_URL ?? DEFAULT_BACKEND_BASE_URL);
+  trimTrailingSlash(
+    getConfiguredValue(
+      process.env.FRONTEND_URL,
+      process.env.FRONTEND_ORIGIN,
+      process.env.CORS_ORIGIN,
+    ) ?? DEFAULT_FRONTEND_ORIGIN,
+  );
+const getBackendBaseUrl = () =>
+  trimTrailingSlash(
+    getConfiguredValue(
+      process.env.BASE_URL,
+      process.env.RENDER_EXTERNAL_URL,
+      process.env.BACKEND_URL,
+    ) ?? DEFAULT_BACKEND_BASE_URL,
+  );
 const getPublicAuthBaseUrl = () =>
-  trimTrailingSlash(process.env.AUTH0_PUBLIC_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? getConfiguredFrontendOrigin());
+  trimTrailingSlash(
+    getConfiguredValue(
+      process.env.AUTH0_PUBLIC_BASE_URL,
+      process.env.BASE_URL,
+      process.env.RENDER_EXTERNAL_URL,
+      process.env.BACKEND_URL,
+    ) ?? getBackendBaseUrl(),
+  );
 const callbackPath = "/api/auth/auth0/callback";
 const getGoogleConnectionName = () => process.env.AUTH0_GOOGLE_CONNECTION ?? "google-oauth2";
 const getGooglePrompt = () => process.env.AUTH0_GOOGLE_PROMPT ?? "select_account";
-const getIssuerBaseUrl = () => process.env.ISSUER_BASE_URL?.replace(/\/+$/, "");
+const getIssuerBaseUrl = () => {
+  const issuerBaseUrl = getConfiguredValue(
+    process.env.AUTH0_DOMAIN,
+    process.env.ISSUER_BASE_URL,
+  );
+
+  return issuerBaseUrl ? normalizeUrl(issuerBaseUrl) : undefined;
+};
+const getAuth0ClientId = () => getConfiguredValue(process.env.AUTH0_CLIENT_ID, process.env.CLIENT_ID);
+const getAuth0ClientSecret = () =>
+  getConfiguredValue(process.env.AUTH0_CLIENT_SECRET, process.env.CLIENT_SECRET);
+const getAuth0SessionSecret = () =>
+  getConfiguredValue(process.env.AUTH0_SECRET, process.env.SESSION_SECRET, process.env.SECRET);
 const isProduction = () => process.env.NODE_ENV === "production";
 const auth0PlaceholderMarkers = [
   "your-backend-service.onrender.com",
@@ -109,9 +145,9 @@ const buildAuthorizationParams = (provider?: string, mode?: string) => ({
 const isConfigured = () =>
   Boolean(
     !hasPlaceholderValue(getIssuerBaseUrl()) &&
-      !hasPlaceholderValue(process.env.CLIENT_ID) &&
-      !hasPlaceholderValue(process.env.CLIENT_SECRET) &&
-      !hasPlaceholderValue(process.env.SECRET) &&
+      !hasPlaceholderValue(getAuth0ClientId()) &&
+      !hasPlaceholderValue(getAuth0ClientSecret()) &&
+      !hasPlaceholderValue(getAuth0SessionSecret()) &&
       !hasPlaceholderValue(getPublicAuthBaseUrl()),
   );
 
@@ -195,10 +231,10 @@ export const createAuth0Middleware = () => {
     authRequired: false,
     auth0Logout: true,
     errorOnRequiredAuth: true,
-    secret: process.env.SECRET,
+    secret: getAuth0SessionSecret(),
     baseURL: getPublicAuthBaseUrl(),
-    clientID: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
+    clientID: getAuth0ClientId(),
+    clientSecret: getAuth0ClientSecret(),
     issuerBaseURL: getIssuerBaseUrl(),
     httpTimeout: getAuth0HttpTimeout(),
     session: {

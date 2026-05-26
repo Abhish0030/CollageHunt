@@ -12,7 +12,7 @@ export interface UserJwtPayload {
 }
 
 const getJwtSecret = () => {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET?.trim() || process.env.SESSION_SECRET?.trim();
   if (!secret) {
     throw new AppError(500, "INTERNAL_SERVER_ERROR", "JWT secret is not configured");
   }
