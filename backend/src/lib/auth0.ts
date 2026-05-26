@@ -213,7 +213,6 @@ export const createAuth0Middleware = () => {
     transactionCookie: {
       name: "collagehunt_auth_verification",
       sameSite: "Lax",
-      secure: isProduction,
     },
     routes: {
       login: false,
