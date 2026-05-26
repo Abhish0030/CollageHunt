@@ -1,80 +1,48 @@
-Got it — you want your **CollageHunt README** upgraded to look clean, modern, and attractive like your **UniLink README** (with banner, sections, polished structure).
+# Gradly
 
-Here’s your **updated README.md** (ready to copy-paste) 👇
+Smart college discovery and comparison platform built with Next.js, Express, Prisma, and PostgreSQL.
 
----
+[Live App](https://gradly-doytmdxgc-abhish0030s-projects.vercel.app/)
 
-# 🎓 CollageHunt
+![Gradly Banner](https://raw.githubusercontent.com/Abhish0030/Gradly/main/frontend/public/readme-banner.png)
 
-**Smart College Discovery & Comparison Platform**
+## Overview
 
-> *Built with Next.js 14, Express, Prisma & PostgreSQL*
+Gradly helps students explore, compare, and shortlist colleges with a clean browsing experience and structured college data.
 
-**🌐 Live App:** *(https://gradly-doytmdxgc-abhish0030s-projects.vercel.app/)*
+## Features
 
-<img src="frontend/public/readme-banner.png" alt="CollageHunt Banner" width="100%" />
+- Search colleges by name, city, or state
+- Compare multiple colleges side by side
+- Save colleges to your profile
+- View dynamic college detail pages
+- Use JWT-based authentication
+- Browse a responsive UI built for desktop and mobile
 
----
-
-## 📌 What is CollageHunt?
-
-CollageHunt is a modern **college discovery platform** designed to help students explore, compare, and save colleges across India.
-
-It simplifies the decision-making process by providing structured college data, comparison tools, and personalized features like saved colleges and filters.
-
-CollageHunt is inspired by platforms like Careers360 and CollegeDunia, but built as a **fast, scalable, and developer-focused MVP**.
-
----
-
-## 🏗️ Architecture
-
-```bash
-Frontend (Next.js 14 + TypeScript + Tailwind)
-        │
-        ▼
-Backend (Node.js + Express + Prisma)
-        │
-        ▼
-PostgreSQL Database
-```
-
----
-
-## ✨ Features
-
-- 🔍 Search colleges by name, city, or state
-- 📊 Compare multiple colleges side by side
-- ❤️ Save colleges to your profile
-- 🔐 JWT-based authentication system
-- 🧾 Dynamic college detail pages
-- ⚡ Optimized frontend with skeleton loaders and smooth UX
-- 📱 Responsive and modern UI
-
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
+
 - Next.js 14
 - TypeScript
 - Tailwind CSS
 - React Query
 - Zustand
 - Framer Motion
-- React Hook Form + Zod
+- React Hook Form
+- Zod
 
 ### Backend
+
 - Node.js
 - Express.js
 - Prisma ORM
 - PostgreSQL
 - JWT Authentication
 
----
+## Project Structure
 
-## 📂 Folder Structure
-
-```bash
+```text
 frontend/
   app/
   components/
@@ -89,15 +57,13 @@ backend/
   src/
 ```
 
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Abhish0030/CollageHunt.git
-cd CollageHunt
+git clone https://github.com/Abhish0030/Gradly.git
+cd Gradly
 ```
 
 ### 2. Install dependencies
@@ -108,11 +74,12 @@ npm install --prefix frontend
 npm install --prefix backend
 ```
 
-### 3. Setup environment variables
+### 3. Set up environment variables
 
-Create your `.env` files:
+Create these files before running the app.
 
-#### backend/.env
+`backend/.env`
+
 ```env
 DATABASE_URL=your_database_url
 DIRECT_URL=your_direct_database_url
@@ -122,7 +89,8 @@ CORS_ORIGIN=http://localhost:3000
 FRONTEND_ORIGIN=http://localhost:3000
 ```
 
-#### frontend/.env.local
+`frontend/.env.local`
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -136,16 +104,12 @@ npm run dev:backend
 npm run dev:frontend
 ```
 
----
+## Deployment
 
-## 📦 Deployment
+- Frontend: Vercel
+- Backend: Render
+- Database: Supabase PostgreSQL
 
-- **Frontend:** Vercel
-- **Backend:** Render
-- **Database:** Supabase / PostgreSQL
-
----
-
-## 📜 License
+## License
 
 This project is licensed under the MIT License.
