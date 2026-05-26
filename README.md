@@ -1,14 +1,14 @@
-# Gradly
+# CollageHunt
 
 Smart college discovery and comparison platform built with Next.js, Express, Prisma, and PostgreSQL.
 
 [Live App](https://gradly-doytmdxgc-abhish0030s-projects.vercel.app/)
 
-![Gradly Banner](https://raw.githubusercontent.com/Abhish0030/Gradly/main/frontend/public/readme-banner.png)
+![CollageHunt Banner](https://raw.githubusercontent.com/Abhish0030/Gradly/main/frontend/public/readme-banner.png)
 
 ## Overview
 
-Gradly helps students explore, compare, and shortlist colleges with a clean browsing experience and structured college data.
+CollageHunt helps students explore, compare, and shortlist colleges with a clean browsing experience and structured college data.
 
 ## Features
 
@@ -63,7 +63,7 @@ backend/
 
 ```bash
 git clone https://github.com/Abhish0030/Gradly.git
-cd Gradly
+cd CollageHunt
 ```
 
 ### 2. Install dependencies
