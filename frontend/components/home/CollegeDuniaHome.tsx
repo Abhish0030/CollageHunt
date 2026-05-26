@@ -10,6 +10,7 @@ import { HeroBanner } from "./HeroBanner";
 import { MegaFooter } from "./MegaFooter";
 import { NewsletterBar } from "./NewsletterBar";
 import { StudyGoalCards } from "./StudyGoalCards";
+import { TopCategoryShowcase } from "./TopCategoryShowcase";
 import { TopCollegeCards } from "./TopCollegeCards";
 import { TopCollegesTable } from "./TopCollegesTable";
 import { TopExamCards } from "./TopExamCards";
@@ -43,6 +44,7 @@ export const CollegeDuniaHome = () => {
 
       <TopStudyPlaces />
       <ExploreCourses />
+      <TopCategoryShowcase />
       <TopExamCards />
       <AdmissionPills />
       <BoardExamLinks />
